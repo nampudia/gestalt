@@ -73,7 +73,7 @@ def transcribe(path):
     return [{"start": round(s.start, 2), "end": round(s.end, 2), "text": s.text.strip()} for s in segs]
 
 
-def claude(content, key, max_tokens=400):
+def claude(content, key, max_tokens=2000):
     body = json.dumps({"model": MODEL, "max_tokens": max_tokens, "messages": [{"role": "user", "content": content}]}).encode()
     req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=body, headers={
         "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"})
@@ -89,6 +89,8 @@ def caption_scene(path, sc, lines, title, key, idx, total):
     content.append({"type": "text", "text": (
         f'These are 3 frames from scene {idx+1} of {total} of the film "{title}", '
         f'running {sc["start"]:.0f}s to {sc["end"]:.0f}s. Dialogue in this scene: {said}\n\n'
+        'Describe only what is visible. Don\'t invent character names or details you can\'t see; '
+        'say "the llama", "the woman" and so on unless a name is spoken or shown on screen.\n'
         'Reply with only JSON: {"title": "2 to 4 word scene name a film editor would use", '
         '"caption": "one plain sentence on what happens", '
         '"tone": "one of comedy, tension, action, emotional, quiet, credits"}')})

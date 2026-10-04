@@ -19,27 +19,49 @@ the room showing each reaction, key moments, stretches where the audience drifte
 
 Write the 5 to 7 most useful notes for the director, editor and marketing team, most important first.
 Rules:
-- Every note must be specific and actionable, and refer to scenes by name with timestamps.
+- Every note must be specific and actionable, and refer to scenes by name. Write times as m:ss (e.g. 10:42), never raw seconds.
+- Keep each body under 70 words.
 - Back every note with the numbers from the data (counts like "9 of 14", engagement vs average). Never invent numbers.
 - These are audience notes, not orders. Suggest, don't command. Never claim certainty about why something happened.
 - If a group or the whole audience is small (under 30 people, or a group under 10), say the note is directional and lower its confidence.
 - Cover editing first (trims, clarity, pacing, joke timing, the ending), then marketing (who to target, trailer and clip moments), then release.
 Reply with ONLY a JSON array, no prose, each item:
-{"area": "Edit" | "Marketing" | "Release" | "Next screening", "priority": 1 | 2 | 3, "title": "short headline", "body": "2-3 sentences", "evidence": [{"t": seconds, "label": "short label"}], "confidence": "low" | "medium" | "high"}"""
+{"area": "Edit" | "Marketing" | "Release" | "Next screening", "priority": 1 | 2 | 3, "title": "short headline", "body": "2-3 sentences, under 70 words", "evidence": [{"t": seconds, "label": "short label"}], "confidence": "low" | "medium" | "high"}"""
 
 
 def ask_claude(payload):
     key = os.environ.get("ANTHROPIC_API_KEY")
-    body = json.dumps({"model": MODEL, "max_tokens": 2500, "messages": [{"role": "user", "content": NOTES_PROMPT + "\n\nSCREENING DATA:\n" + json.dumps(payload)}]}).encode()
+    body = json.dumps({"model": MODEL, "max_tokens": 8000, "messages": [{"role": "user", "content": NOTES_PROMPT + "\n\nSCREENING DATA:\n" + json.dumps(payload)}]}).encode()
     req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=body, headers={
         "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"})
     with urllib.request.urlopen(req, timeout=180) as r:
         data = json.load(r)
     text = "".join(b.get("text", "") for b in data.get("content", []))
-    m = re.search(r"\[.*\]", text, re.S)
-    if not m:
+    return parse_notes(text)
+
+
+def parse_notes(text):
+    """Read the JSON array, keeping every complete note even if the reply was cut off."""
+    start = text.find("[")
+    if start < 0:
         raise ValueError("Claude didn't return notes in the expected format")
-    return json.loads(m.group(0))
+    try:
+        return json.loads(text[start:text.rfind("]") + 1])
+    except ValueError:
+        pass
+    dec, i, notes = json.JSONDecoder(), start + 1, []
+    while True:
+        j = text.find("{", i)
+        if j < 0:
+            break
+        try:
+            obj, i = dec.raw_decode(text, j)
+            notes.append(obj)
+        except ValueError:
+            break
+    if not notes:
+        raise ValueError("Claude didn't return notes in the expected format")
+    return notes
 
 
 class RangeHandler(http.server.SimpleHTTPRequestHandler):

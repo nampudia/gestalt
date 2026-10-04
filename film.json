@@ -1,17 +1,84 @@
 {
   "title": "Caminandes 3: Llamigos",
-  "duration": 150.1,
+  "duration": 150.12,
   "scenes": [
-    {"start": 0.0,    "end": 21.38,  "title": "Ice slip", "caption": "After the title card, Koro the llama skids across a frozen pond trying to reach a patch of red berries.", "tone": "comedy", "dialogue": ""},
-    {"start": 21.38,  "end": 33.88,  "title": "Train incoming", "caption": "A penguin pops up next to the sprawled llama on a railway line while a steam train barrels toward them.", "tone": "tension", "dialogue": ""},
-    {"start": 33.88,  "end": 49.88,  "title": "Standoff on the tracks", "caption": "The llama panics on the tracks as the train closes in, while the penguin stays completely unbothered.", "tone": "tension", "dialogue": ""},
-    {"start": 49.88,  "end": 66.42,  "title": "Berry victory", "caption": "The llama snags a berry on its tongue and gloats, the train smashes through, and the pair end up deep in a dark mine.", "tone": "comedy", "dialogue": ""},
-    {"start": 66.42,  "end": 78.92,  "title": "Mine-cart ride", "caption": "A runaway mine-cart ride through the tunnel, with the penguin riding a cart full of berries.", "tone": "action", "dialogue": ""},
-    {"start": 78.92,  "end": 89.33,  "title": "Berries go flying", "caption": "The cart bursts out of the mountainside, berries scatter through the air and the llama leaps after them.", "tone": "action", "dialogue": ""},
-    {"start": 89.33,  "end": 101.79, "title": "Mid-air collision", "caption": "Llama and penguin meet face to face in mid-air; the llama's horrified double take.", "tone": "comedy", "dialogue": ""},
-    {"start": 101.79, "end": 114.5,  "title": "Crash landing", "caption": "The llama tumbles past snowy peaks and lands flat in the snow as the penguin glides by.", "tone": "comedy", "dialogue": ""},
-    {"start": 114.5,  "end": 150.12, "title": "Llamigos", "caption": "At sunset the lonely llama is met by a whole penguin colony carrying berries, a truce, then the credits.", "tone": "emotional", "dialogue": ""}
+    {
+      "start": 0.0,
+      "end": 21.38,
+      "title": "Llama Slips on Ice",
+      "caption": "After a title card over a blue sky, a llama slides and flails across a frozen puddle in a snowy mountain field near a wire fence, then ends up sprawled flat on the ice beside a small plant with red berries.",
+      "tone": "comedy",
+      "dialogue": ""
+    },
+    {
+      "start": 21.38,
+      "end": 33.88,
+      "title": "Penguin and llama on tracks",
+      "caption": "A small gray and white penguin stands in the snow beside a llama lying on its side, then appears tiny between railroad tracks with a small green plant bearing a red bud.",
+      "tone": "quiet",
+      "dialogue": ""
+    },
+    {
+      "start": 33.88,
+      "end": 49.88,
+      "title": "Penguin Peeks Over Ridge",
+      "caption": "In a snowy landscape, the wide-eyed llama turns toward the camera with a startled expression, and a small penguin peeks up over a misty ridge in the distance.",
+      "tone": "comedy",
+      "dialogue": ""
+    },
+    {
+      "start": 49.88,
+      "end": 66.42,
+      "title": "Llama's Underground Mine Ride",
+      "caption": "A llama wearing a round goggle-like headpiece looks around in a snowy landscape, then appears upside down in a dark, blue underwater-like cave, and finally rides a wooden mine cart along a rickety track with a small white bird and a red flower beside it.",
+      "tone": "action",
+      "dialogue": ""
+    },
+    {
+      "start": 66.42,
+      "end": 78.92,
+      "title": "Mine Cart Berries",
+      "caption": "A mine track runs down a dark, broken cavern, then a tan animal with heavy-lidded eyes sits in a wooden cart beside a small black-and-white penguin-like bird, with a pile of red berries between them in a snowy setting.",
+      "tone": "comedy",
+      "dialogue": ""
+    },
+    {
+      "start": 78.92,
+      "end": 89.33,
+      "title": "Airborne Over Mountains",
+      "caption": "The llama and a small white penguin tumble and float through the air high above snowy mountains and clouds, with the llama's eyes wide and its mouth open in surprise.",
+      "tone": "comedy",
+      "dialogue": ""
+    },
+    {
+      "start": 89.33,
+      "end": 101.79,
+      "title": "Tumbling Down Snow",
+      "caption": "A wide-eyed, orange-brown animal with a long neck appears against a backdrop of clouds, then rolls down a snowy slope in a ball past jagged rocky peaks and ends up sprawled flat on its belly in the snow.",
+      "tone": "comedy",
+      "dialogue": ""
+    },
+    {
+      "start": 101.79,
+      "end": 114.5,
+      "title": "Llama's Clifftop Gaze",
+      "caption": "The animated llama faces the camera in a snowy mountain landscape, its large eyes shifting from wide open to heavy-lidded and squinting, then the view cuts to a wide shot of the llama standing at the edge of a snowy cliff above the ocean, with a striped lighthouse nearby.",
+      "tone": "quiet",
+      "dialogue": ""
+    },
+    {
+      "start": 114.5,
+      "end": 150.12,
+      "title": "Penguin's Berry Gift",
+      "caption": "In a snowy landscape, a small penguin holds out a bunch of red berries to the llama, then the llama lies in the snow among a crowd of penguins and an offering of berries, fish and lanterns, before the film's credits appear over a starry sky.",
+      "tone": "emotional",
+      "dialogue": ""
+    }
   ],
   "transcript": [],
-  "generated_by": {"scenes": "ffmpeg", "transcript": null, "captions": "Claude (from keyframes, demo build)"}
+  "generated_by": {
+    "scenes": "ffmpeg",
+    "transcript": null,
+    "captions": "claude-sonnet-5-5"
+  }
 }

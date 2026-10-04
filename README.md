@@ -47,7 +47,7 @@ python3 analyze_film.py my-cut.mp4 --title "My Film"
 | `index.html` | The whole app: viewer flow, studio, results editor, report |
 | `serve.py` | Local server: video seeking, plus the `/api/notes` Claude proxy |
 | `analyze_film.py` | Film understanding pipeline (scenes, Whisper, Claude captions) |
-| `film.json` | Scene data for the sample film |
+| `film.json` | Scene data for the sample film, captioned by Claude via `analyze_film.py` |
 | `caminandes.mp4`, `poster.jpg` | Sample film, 720p |
 | `prototypes/` | Earlier experiments (Python capture script, first dashboard) |
 
