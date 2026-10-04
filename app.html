@@ -1556,7 +1556,9 @@ function notesCard(){
   const ai = R.aiNotes?.[R.seg], notes = ai || ruleNotes();
   const src = ai ? `<span class="badge ai">✨ Written by Claude${R.claudeModel ? " · " + esc(R.claudeModel) : ""}</span>` : `<span class="badge">Smart rules</span>`;
   const btn = claudeOK ? `<button class="ask" id="askClaude" ${R.notesBusy ? "disabled" : ""}>${ai ? "✨ Rewrite with Claude" : "✨ Ask Claude for deeper notes"}</button>`
-    : `<span class="askhint">Deeper notes from Claude unlock when you run serve.py with your API key.</span>`;
+    : location.protocol === "file:"
+      ? `<span class="askhint">This page was opened as a file, so Claude can't reach it. Run serve.py, then open localhost:8000/app.html.</span>`
+      : `<span class="askhint">Deeper notes from Claude unlock when you run serve.py with your API key set.</span>`;
   const cav = ai && R.aiCaveat?.[R.seg] ? `<p class="caveat">${esc(R.aiCaveat[R.seg])}</p>` : "";
   const body = R.notesBusy ? `<div class="nload"><i></i>Claude is reading the screening, scene by scene…</div>`
     : notes.length ? `<ol class="nlist">${notes.map(n => `<li class="ni p${n.p}"><div class="ntop"><span class="area">${esc(n.area)}</span><span class="cf ${n.conf}">${n.conf} confidence</span></div>
