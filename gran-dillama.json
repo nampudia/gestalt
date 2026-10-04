@@ -1,0 +1,92 @@
+{
+  "title": "Caminandes 2: Gran Dillama",
+  "duration": 146.05,
+  "scenes": [
+    {
+      "start": 0.0,
+      "end": 14.46,
+      "title": "Llama in Andean Landscape",
+      "caption": "In a dry, grassy highland with a dark rock and snowy blue mountains behind, a title appears on screen and a llama walks into view from the left, its ears perked up.",
+      "tone": "quiet",
+      "dialogue": ""
+    },
+    {
+      "start": 14.46,
+      "end": 27.96,
+      "title": "Llama Along the Fence",
+      "caption": "The llama, with a big wide eye and a long neck, looks around in close-up, then walks past a barbed-wire fence across a dry, sparse landscape with mountains in the background.",
+      "tone": "comedy",
+      "dialogue": ""
+    },
+    {
+      "start": 27.96,
+      "end": 39.62,
+      "title": "Llama Eyes the Shrub",
+      "caption": "In a dry mountain landscape, the llama stands behind a barbed-wire fence and looks wide-eyed to the side, with a shot of a small, lonely leafy bush growing from the sandy ground between them.",
+      "tone": "comedy",
+      "dialogue": ""
+    },
+    {
+      "start": 39.62,
+      "end": 53.62,
+      "title": "Llama Meets Electric Fence",
+      "caption": "In a dry mountain landscape, the llama trots toward a wire fence with a flashing electric post, then ends up sitting dazed on the ground beside it.",
+      "tone": "comedy",
+      "dialogue": ""
+    },
+    {
+      "start": 53.62,
+      "end": 74.92,
+      "title": "Llama Meets Electric Fence",
+      "caption": "The llama peers curiously through the wires of a fence in a desert landscape, then in the following frames lies on its back on the ground near an electrified fence post that sparks with blue light, apparently knocked over by a shock.",
+      "tone": "comedy",
+      "dialogue": ""
+    },
+    {
+      "start": 74.92,
+      "end": 87.38,
+      "title": "Creature at the Fence",
+      "caption": "In a dry, grassy landscape with blue mountains behind, a small orange furry animal with large eyes appears at the base of an electric fence with red insulator rings and rises up to look along it.",
+      "tone": "quiet",
+      "dialogue": ""
+    },
+    {
+      "start": 87.38,
+      "end": 99.33,
+      "title": "Llama Electrocuted, Seen From Space",
+      "caption": "A view of Earth with a bright sun cuts to the llama rearing up in a glowing blue electric shock on an electric fence at night, then to a dark sky where a thin white trail rises.",
+      "tone": "comedy",
+      "dialogue": ""
+    },
+    {
+      "start": 99.33,
+      "end": 114.67,
+      "title": "Llama Hits Electric Fence",
+      "caption": "A cloud of dust drifts along a wire fence with a red horned post at night, then in daylight the llama lurches and lands on the ground with wide eyes, and it ends up sitting dazed with its fur frazzled beside the fence.",
+      "tone": "comedy",
+      "dialogue": ""
+    },
+    {
+      "start": 114.67,
+      "end": 129.25,
+      "title": "Llama Sits, Credits Roll",
+      "caption": "The llama sits dazed on the desert ground beside the electric fence, then the screen changes to a blurred desert backdrop with the director and crew credits, followed by a list of pre-sale sponsors and a special thanks to Render Street.",
+      "tone": "credits",
+      "dialogue": ""
+    },
+    {
+      "start": 129.25,
+      "end": 146.05,
+      "title": "Desert Aftermath and Credits",
+      "caption": "A small brown animal sits dazed in a dry desert beside a wire fence with a red-tipped post, then the view shifts to a rainbow over the sunlit landscape, followed by a black end card with a Creative Commons license and the Blender logo.",
+      "tone": "credits",
+      "dialogue": ""
+    }
+  ],
+  "transcript": [],
+  "generated_by": {
+    "scenes": "ffmpeg",
+    "transcript": null,
+    "captions": "claude-sonnet-5-5"
+  }
+}

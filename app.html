@@ -48,6 +48,7 @@ a{color:var(--lav)}
 .home h1{font-size:clamp(40px,10.5vw,60px); line-height:.96; letter-spacing:-.04em; font-weight:800; margin:10px 0 14px}
 .home h1 em{font-style:normal; color:var(--ok)}
 .home .lede{color:var(--muted); font-size:17.5px; margin:0 0 24px; max-width:44ch}
+.films{display:grid; gap:16px}
 .feat{background:var(--panel); border:1px solid var(--line); border-radius:28px; overflow:hidden}
 .feat .pic{position:relative; aspect-ratio:16/9; background:#222 center/cover no-repeat}
 .feat .pay{position:absolute; top:14px; left:14px; background:var(--ok); color:#10260F; font-weight:800; font-size:16px; padding:7px 13px; border-radius:999px; box-shadow:0 6px 20px rgba(0,0,0,.35)}
@@ -373,14 +374,7 @@ table.segt{width:100%; border-collapse:collapse; font-size:14.5px; min-width:560
   <div class="hwrap">
     <h1>get paid to watch movies <em>before anyone else.</em></h1>
     <p class="lede">Studios pay for honest reactions. Watch a screening with your camera on, answer five quick questions, and get paid.</p>
-    <div class="feat">
-      <div class="pic" id="featPic"><span class="pay" id="featPay">+$2.00</span><span class="live">🟢 open now</span></div>
-      <div class="body">
-        <h2>Caminandes 3: Llamigos</h2>
-        <p class="meta">Comedy · 2 min 30 s · from Blender Studio</p>
-        <button class="btn block" id="earnGo">watch &amp; earn $2</button>
-      </div>
-    </div>
+    <div class="films" id="films"></div>
     <div class="how">
       <div><i>🎬</i><div><b>Watch the screening</b><span>Straight through, like you're at the movies.</span></div></div>
       <div><i>👀</i><div><b>Your camera reads the room</b><span>It notices laughs and drifting. No video is saved.</span></div></div>
@@ -390,7 +384,7 @@ table.segt{width:100%; border-collapse:collapse; font-size:14.5px; min-width:560
       <h3>Opening soon</h3>
       <div class="it"><span class="ph2">🍄</span><div><b>Sprite Fright</b><span>Horror-comedy · 10 min</span></div><em>$6.00</em></div>
     </div>
-    <p class="foot">Concept demo: payouts aren't live yet. Caminandes 3: Llamigos © Blender Foundation, CC BY 3.0.<br><button id="toStudio">I'm a studio, show me the studio side</button></p>
+    <p class="foot">Concept demo: payouts aren't live yet. Caminandes films © Blender Foundation, CC BY 3.0.<br><button id="toStudio">I'm a studio, show me the studio side</button></p>
   </div>
 </div>
 
@@ -1004,36 +998,49 @@ $("openDemo").onclick = () => openResults(true);
    EARN HOME (viewer marketplace)
    ============================================================ */
 const PAY = 2;
-const DEMO_FILM = { kind:"url", name:"Caminandes 3: Llamigos", title:"Caminandes 3: Llamigos", studio:"Blender Studio", credit:"© Blender Foundation, CC BY 3.0",
-  local:"caminandes.mp4", meta:"film.json", remote:"https://archive.org/download/CaminandesLlamigos/Caminandes_%20Llamigos-1080p.mp4" };
+const FILMS = [
+  { id:"llamigos", kind:"url", name:"Caminandes 3: Llamigos", title:"Caminandes 3: Llamigos", genre:"Comedy", runtime:"2 min 30 s", studio:"Blender Studio", credit:"© Blender Foundation, CC BY 3.0",
+    local:"caminandes.mp4", meta:"film.json", poster:"poster.jpg", remote:"https://archive.org/download/CaminandesLlamigos/Caminandes_%20Llamigos-1080p.mp4", tint:["#9fd3ff","#eef6ff","#ffffff"] },
+  { id:"dillama", kind:"url", name:"Caminandes 2: Gran Dillama", title:"Caminandes 2: Gran Dillama", genre:"Comedy", runtime:"2 min 26 s", studio:"Blender Studio", credit:"© Blender Foundation, CC BY 3.0",
+    local:"gran-dillama.mp4", meta:"gran-dillama.json", poster:"gran-dillama.jpg", remote:"https://archive.org/download/Caminandes2GranDillama/02_gran_dillama_1080p.mp4", tint:["#f6c48a","#fbe7c8","#c86a3a"] },
+];
 const wallet = { get(){ try { return +localStorage.getItem("screentest.wallet") || 0; } catch { return 0; } },
   add(v){ const n = this.get() + v; try { localStorage.setItem("screentest.wallet", String(n)); } catch {} return n; } };
 let walletMem = null;
 function balance(){ const b = wallet.get(); return walletMem != null ? Math.max(walletMem, b) : b; }
 function paintWallet(){ $("walletAmt").textContent = "$" + balance().toFixed(2); }
-let demoSrc = null;
-async function resolveDemoSrc(){
-  if (demoSrc) return demoSrc;
-  for (const u of [DEMO_FILM.local, DEMO_FILM.remote]){
+const filmSrc = {};
+async function resolveFilmSrc(f){
+  if (filmSrc[f.id]) return filmSrc[f.id];
+  for (const u of [f.local, f.remote]){
     const v = document.createElement("video"); v.preload = "metadata"; v.muted = true; v.src = u;
-    try { await once(v, "loadedmetadata", 8000); demoSrc = { src:u, duration:Math.floor(v.duration) }; return demoSrc; } catch {}
+    try { await once(v, "loadedmetadata", 8000); return filmSrc[f.id] = { src:u, duration:Math.floor(v.duration) }; } catch {}
   }
   return null;
 }
 function showHome(){
-  paintWallet(); show("v-home"); $("featPay").textContent = "+$" + PAY.toFixed(2);
-  const img = new Image(); img.onload = () => $("featPic").style.backgroundImage = "url(poster.jpg)"; img.src = "poster.jpg";
-  if (!$("featPic").style.backgroundImage){ const c = document.createElement("canvas"); c.width = 640; c.height = 360; drawFrame(c.getContext("2d"), 640, 360, 0, ["#9fd3ff","#eef6ff","#ffffff"]); $("featPic").style.backgroundImage = `url(${c.toDataURL()})`; }
+  paintWallet(); show("v-home");
+  $("films").innerHTML = FILMS.map((f,i) => `<div class="feat">
+    <div class="pic" id="pic-${f.id}"><span class="pay">+$${PAY.toFixed(2)}</span><span class="live">🟢 open now</span></div>
+    <div class="body"><h2>${esc(f.title)}</h2><p class="meta">${esc(f.genre)} · ${esc(f.runtime)} · from ${esc(f.studio)}</p>
+    <button class="btn block${i ? " lav" : ""}" data-film="${f.id}">watch &amp; earn $${PAY}</button></div></div>`).join("");
+  FILMS.forEach(f => {
+    const pic = $("pic-" + f.id), c = document.createElement("canvas"); c.width = 640; c.height = 360;
+    drawFrame(c.getContext("2d"), 640, 360, 0, f.tint); pic.style.backgroundImage = `url(${c.toDataURL()})`;
+    const img = new Image(); img.onload = () => pic.style.backgroundImage = `url(${f.poster})`; img.src = f.poster;
+  });
 }
-$("earnGo").onclick = async () => {
-  const b = $("earnGo"); b.disabled = true; b.textContent = "loading the screening…";
-  const r = await resolveDemoSrc(); b.disabled = false; b.textContent = `watch & earn $${PAY}`;
-  if (!r){ toast("Couldn't load the film. Put caminandes.mp4 next to this page."); return; }
-  S.film = { ...DEMO_FILM, src:r.src, duration:r.duration };
-  const inv = { v:2, id:Math.random().toString(36).slice(2,8), n:"viewer", e:"", t:DEMO_FILM.title, st:DEMO_FILM.studio, s:r.src, d:r.duration, x:0, o:{ wm:true, leave:true, cam:true } };
+$("films").onclick = async e => {
+  const b = e.target.closest("[data-film]"); if (!b) return;
+  const f = FILMS.find(x => x.id === b.dataset.film), label = b.textContent;
+  b.disabled = true; b.textContent = "loading the screening…";
+  const r = await resolveFilmSrc(f); b.disabled = false; b.innerHTML = label.replace("&", "&amp;");
+  if (!r){ toast(`Couldn't load the film. Put ${f.local} next to this page.`); return; }
+  S.film = { ...f, src:r.src, duration:r.duration };
+  const inv = { v:2, id:Math.random().toString(36).slice(2,8), n:"viewer", e:"", t:f.title, st:f.studio, s:r.src, d:r.duration, x:0, o:{ wm:true, leave:true, cam:true } };
   W.earn = true;
   startViewer(inv, r.src, { done:false, data:inv, earn:true });
-  $("tFrom").textContent = `${DEMO_FILM.studio} · pays $${PAY.toFixed(2)}`;
+  $("tFrom").textContent = `${f.studio} · pays $${PAY.toFixed(2)}`;
 };
 $("toStudio").onclick = () => { history.replaceState(null, "", "#studio"); show("v-studio"); };
 $("toHome").onclick = () => { history.replaceState(null, "", location.pathname + location.search); showHome(); };

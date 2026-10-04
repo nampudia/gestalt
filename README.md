@@ -52,7 +52,8 @@ python3 analyze_film.py my-cut.mp4 --title "My Film"
 | `serve.py` | Local server: video seeking, plus the `/api/notes` Claude proxy |
 | `analyze_film.py` | Film understanding pipeline (scenes, Whisper, Claude captions) |
 | `film.json` | Scene data for the sample film, captioned by Claude via `analyze_film.py` |
-| `caminandes.mp4`, `poster.jpg` | Sample film, 720p |
+| `caminandes.mp4`, `poster.jpg`, `film.json` | Sample film 1: Caminandes 3: Llamigos (720p, poster, scenes) |
+| `gran-dillama.mp4`, `gran-dillama.jpg`, `gran-dillama.json` | Sample film 2: Caminandes 2: Gran Dillama (720p, poster, scenes) |
 | `prototypes/` | Earlier experiments (Python capture script, first dashboard) |
 
 ## How reactions are measured
@@ -73,4 +74,4 @@ MediaPipe Face Landmarker runs in the viewer's browser. No video leaves the devi
 
 ## Credits
 
-Sample film: *Caminandes 3: Llamigos* © Blender Foundation, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
+Sample films: *Caminandes 3: Llamigos* and *Caminandes 2: Gran Dillama* © Blender Foundation, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
