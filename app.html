@@ -344,6 +344,9 @@ table.segt{width:100%; border-collapse:collapse; font-size:14.5px; min-width:560
 .ni b{display:block; font-size:16.5px; letter-spacing:-.01em; margin-bottom:4px}
 .ni p{margin:0; color:#D8CFDC; font-size:14.5px; line-height:1.5}
 .ev{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px}
+.ni p.try{margin-top:10px; padding:10px 12px; border-radius:12px; background:rgba(201,184,255,.10); color:var(--ink)}
+.ni p.try span{display:inline-block; font-size:11.5px; font-weight:800; color:#1A1114; background:var(--lav); border-radius:999px; padding:1px 8px; margin-right:8px; vertical-align:1px}
+.caveat{margin:0 0 12px; padding:10px 14px; border-radius:12px; background:rgba(255,200,87,.08); border:1px solid rgba(255,200,87,.25); color:#F3E3BF; font-size:14px}
 .ev button{border:0; background:rgba(255,255,255,.08); border-radius:999px; padding:5px 10px; font-size:12.5px; font-weight:700; color:var(--ink)}
 .ev button:hover{background:rgba(255,255,255,.16)}
 .nload{display:flex; align-items:center; gap:10px; color:var(--muted); font-size:14.5px; padding:14px 0}
@@ -1543,8 +1546,9 @@ async function askClaude(){
     const r = await fetch("/api/notes", { method:"POST", headers:{ "Content-Type":"application/json" }, body:JSON.stringify(claudePayload()) });
     const j = await r.json(); if (!r.ok || !Array.isArray(j.notes)) throw new Error(j.error || "No notes came back");
     R.aiNotes[R.seg] = j.notes.filter(n => n && n.title).map(n => ({ area:String(n.area||"Edit"), p:clamp(+n.priority||2,1,3), conf:["low","medium","high"].includes(n.confidence) ? n.confidence : "medium",
-      title:String(n.title), body:String(n.body||""), ev:(Array.isArray(n.evidence) ? n.evidence : []).filter(e => isFinite(+e.t)).slice(0,5).map(e => ({ t:clamp(+e.t,0,R.D-1), l:`${fmt(+e.t)} ${String(e.label||"").slice(0,40)}` })) }))
+      title:String(n.title), body:String(n.observation||n.body||""), tryit:String(n.suggestion||""), ev:(Array.isArray(n.evidence) ? n.evidence : []).filter(e => isFinite(+e.t)).slice(0,5).map(e => ({ t:clamp(+e.t,0,R.D-1), l:`${fmt(+e.t)} ${String(e.label||"").slice(0,40)}` })) }))
       .sort((a,b) => a.p - b.p);
+    R.aiCaveat = R.aiCaveat || {}; R.aiCaveat[R.seg] = String(j.caveat || "");
   } catch (e) { toast("Claude couldn't write notes: " + String(e.message || e).slice(0,80)); }
   R.notesBusy = false; renderReport();
 }
@@ -1553,11 +1557,12 @@ function notesCard(){
   const src = ai ? `<span class="badge ai">✨ Written by Claude${R.claudeModel ? " · " + esc(R.claudeModel) : ""}</span>` : `<span class="badge">Smart rules</span>`;
   const btn = claudeOK ? `<button class="ask" id="askClaude" ${R.notesBusy ? "disabled" : ""}>${ai ? "✨ Rewrite with Claude" : "✨ Ask Claude for deeper notes"}</button>`
     : `<span class="askhint">Deeper notes from Claude unlock when you run serve.py with your API key.</span>`;
+  const cav = ai && R.aiCaveat?.[R.seg] ? `<p class="caveat">${esc(R.aiCaveat[R.seg])}</p>` : "";
   const body = R.notesBusy ? `<div class="nload"><i></i>Claude is reading the screening, scene by scene…</div>`
     : notes.length ? `<ol class="nlist">${notes.map(n => `<li class="ni p${n.p}"><div class="ntop"><span class="area">${esc(n.area)}</span><span class="cf ${n.conf}">${n.conf} confidence</span></div>
-      <b>${esc(n.title)}</b><p>${esc(n.body)}</p>${n.ev.length ? `<div class="ev">${n.ev.map(e => `<button data-t="${e.t}">${esc(e.l)}</button>`).join("")}</div>` : ""}</li>`).join("")}</ol>`
+      <b>${esc(n.title)}</b><p>${esc(n.body)}</p>${n.tryit ? `<p class="try"><span>Try</span>${esc(n.tryit)}</p>` : ""}${n.ev.length ? `<div class="ev">${n.ev.map(e => `<button data-t="${e.t}">${esc(e.l)}</button>`).join("")}</div>` : ""}</li>`).join("")}</ol>`
     : `<p class="none">Not enough data for notes yet.</p>`;
-  return `<div class="rcard wide notes"><div class="nhead"><div><h3>Audience notes</h3><p class="q">What the audience is telling you, ranked by impact. Click any evidence to jump to it.</p></div><div class="nsrc">${src}${btn}</div></div>${body}</div>`;
+  return `<div class="rcard wide notes"><div class="nhead"><div><h3>Audience notes</h3><p class="q">What the audience is telling you, ranked by impact. Click any evidence to jump to it.</p></div><div class="nsrc">${src}${btn}</div></div>${R.notesBusy ? "" : cav}${body}</div>`;
 }
 function scenesCard(){
   const st = sceneStats(); if (!st.length) return "";

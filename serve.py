@@ -13,20 +13,30 @@ PORT = int(os.environ.get("PORT", 8000))
 MODEL = os.environ.get("SCREENTEST_MODEL", "claude-sonnet-5-5")
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-NOTES_PROMPT = """You are the head of audience research for a film test-screening service. A studio just ran a screening.
-Below is the data: scene list (auto-detected, named from the picture and dialogue), per-scene engagement (0-100) and the peak share of
-the room showing each reaction, key moments, stretches where the audience drifted, walkouts, survey answers and audience-group breakdowns.
+NOTES_PROMPT = """You are a sharp story editor and audience-research lead sitting in on a film test screening. Below is the data:
+an auto-detected scene list (each scene named and described from its frames and dialogue), per-scene engagement (0-100) and the
+peak share of the room showing each reaction, key moments, stretches where the audience drifted, walkouts, survey answers and
+audience-group breakdowns.
 
-Write the 5 to 7 most useful notes for the director, editor and marketing team, most important first.
+Your job is to give the filmmakers ideas they can try, not to restate the data.
+
+Write 4 to 6 notes, most valuable first. Each note has:
+- "observation": what the audience did, with the specific numbers and timestamp. One or two sentences, under 35 words.
+- "suggestion": a concrete creative move to try in the edit, sound, music, story or marketing. Be specific and imaginative:
+  "trim the 6 seconds of the llama staring before the fence jump", "hold on the penguin's reaction for an extra beat",
+  "add a sound sting as the cart drops", "cut a 15-second vertical clip from 1:04 to 1:19 ending on the crash".
+  Use what the scene descriptions tell you about the picture. Give one main idea, optionally a second alternative. Under 45 words.
+
 Rules:
-- Every note must be specific and actionable, and refer to scenes by name. Write times as m:ss (e.g. 10:42), never raw seconds.
-- Keep each body under 70 words.
-- Back every note with the numbers from the data (counts like "9 of 14", engagement vs average). Never invent numbers.
-- These are audience notes, not orders. Suggest, don't command. Never claim certainty about why something happened.
-- If a group or the whole audience is small (under 30 people, or a group under 10), say the note is directional and lower its confidence.
-- Cover editing first (trims, clarity, pacing, joke timing, the ending), then marketing (who to target, trailer and clip moments), then release.
-Reply with ONLY a JSON array, no prose, each item:
-{"area": "Edit" | "Marketing" | "Release" | "Next screening", "priority": 1 | 2 | 3, "title": "short headline", "body": "2-3 sentences, under 70 words", "evidence": [{"t": seconds, "label": "short label"}], "confidence": "low" | "medium" | "high"}"""
+- Every note covers a DIFFERENT scene or a different problem. Never repeat a point.
+- Do NOT mention sample size, confidence or "directional" inside any note. Put that once, in "caveat", and nowhere else.
+- Skip anything the data can't speak to. No notes that only say something is unknown or untested.
+- Refer to scenes by name and times as m:ss (e.g. 10:42), never raw seconds. Never invent numbers.
+- Strongest note first. Mix edit notes with at least one marketing note when there are reactions to work with.
+Reply with ONLY a JSON object, no prose:
+{"caveat": "one short sentence on how much weight the data can bear, or an empty string if the sample is solid",
+ "notes": [{"area": "Edit" | "Sound & music" | "Story" | "Marketing" | "Release", "priority": 1 | 2 | 3, "title": "a short headline that states the idea",
+ "observation": "...", "suggestion": "...", "evidence": [{"t": seconds, "label": "short label"}], "confidence": "low" | "medium" | "high"}]}"""
 
 
 def ask_claude(payload):
@@ -41,7 +51,21 @@ def ask_claude(payload):
 
 
 def parse_notes(text):
-    """Read the JSON array, keeping every complete note even if the reply was cut off."""
+    """Read {"caveat", "notes": [...]} (or a bare array), keeping every complete note even if the reply was cut off."""
+    caveat = ""
+    m = re.search(r'"caveat"\s*:\s*"((?:[^"\\]|\\.)*)"', text)
+    if m:
+        caveat = json.loads('"' + m.group(1) + '"')
+    try:
+        obj = json.loads(text[text.find("{"):text.rfind("}") + 1])
+        if isinstance(obj, dict) and isinstance(obj.get("notes"), list):
+            return {"caveat": obj.get("caveat", caveat), "notes": obj["notes"]}
+    except ValueError:
+        pass
+    return {"caveat": caveat, "notes": parse_note_list(text)}
+
+
+def parse_note_list(text):
     start = text.find("[")
     if start < 0:
         raise ValueError("Claude didn't return notes in the expected format")
@@ -86,7 +110,8 @@ class RangeHandler(http.server.SimpleHTTPRequestHandler):
         try:
             n = int(self.headers.get("Content-Length", 0))
             payload = json.loads(self.rfile.read(min(n, 2_000_000)))
-            return self._json(200, {"notes": ask_claude(payload), "model": MODEL})
+            out = ask_claude(payload)
+            return self._json(200, {"notes": out["notes"], "caveat": out["caveat"], "model": MODEL})
         except urllib.error.HTTPError as e:
             detail = e.read().decode(errors="ignore")[:300]
             return self._json(502, {"error": f"Claude API {e.code}: {detail}"})
