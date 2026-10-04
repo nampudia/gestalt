@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Run the Screentest demo locally:  python3 serve.py
-Opens http://localhost:8000 in your browser. Ctrl+C to stop.
+Opens http://localhost:8000 (the site; the app is /app.html). Ctrl+C to stop.
 
 For Claude-written Audience notes, set your API key first (from platform.claude.com):
     export ANTHROPIC_API_KEY=sk-ant-...

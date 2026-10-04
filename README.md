@@ -20,10 +20,13 @@ python3 serve.py
 The key stays on your machine. The page calls `serve.py`, and only `serve.py` talks to the Claude API. Without a key, notes come from built-in rules.
 
 Useful URLs:
-- `/` viewer app (watch & earn)
-- `/#studio` studio dashboard (invites, protection settings)
-- `/?sample=1` sample 14-person screening with the full report
-- `?demo=1` fake face tracking, for testing without a camera
+- `/` the website for studios (landing page with a live sample timeline and pilot request form)
+- `/app.html` viewer app (watch & earn)
+- `/app.html#studio` studio dashboard (invites, protection settings)
+- `/app.html#sample` sample 14-person screening with the full report
+- `/app.html?demo=1` fake face tracking, for testing without a camera
+
+Before sharing the site, set `CONTACT` near the bottom of `index.html` to your real email.
 
 ## Understanding a film
 
@@ -44,7 +47,8 @@ python3 analyze_film.py my-cut.mp4 --title "My Film"
 
 | File | What it is |
 |---|---|
-| `index.html` | The whole app: viewer flow, studio, results editor, report |
+| `index.html` | The website for studios |
+| `app.html` | The whole app: viewer flow, studio, results editor, report |
 | `serve.py` | Local server: video seeking, plus the `/api/notes` Claude proxy |
 | `analyze_film.py` | Film understanding pipeline (scenes, Whisper, Claude captions) |
 | `film.json` | Scene data for the sample film, captioned by Claude via `analyze_film.py` |

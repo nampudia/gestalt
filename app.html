@@ -1,0 +1,1861 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#121014">
+<title>Screentest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#121014; --panel:#1B181F; --panel2:#24202A; --panel3:#302A37; --ink:#F6EFE6; --muted:#A79FAE; --dim:#6F6877;
+  --line:rgba(246,239,230,.10); --line2:rgba(246,239,230,.18);
+  --pop:#FF7A45; --pop-ink:#1A1114; --lav:#C9B8FF; --ok:#8BE39B; --warn:#FFC857;
+  --laugh:#FFC857; --surprise:#5FD3F3; --tension:#FF7A45; --confused:#C9B8FF; --cringe:#8BE39B; --drift:#FF5C7A; --fire:#FF4D2E;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0; background:var(--bg); color:var(--ink)}
+body{
+  font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif; font-size:16px; line-height:1.45;
+  -webkit-font-smoothing:antialiased; font-variant-numeric:tabular-nums;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+button,input,select{font:inherit; color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--lav); outline-offset:2px}
+a{color:var(--lav)}
+
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:14px 22px; border:0; border-radius:999px;
+  background:var(--pop); color:var(--pop-ink); font-weight:800; font-size:17px; letter-spacing:-.01em; transition:transform .12s, filter .12s}
+.btn:hover{filter:brightness(1.07)} .btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.4; cursor:not-allowed; filter:none; transform:none}
+.btn.block{display:flex; width:100%}
+.btn.ghost{background:transparent; color:var(--ink); box-shadow:inset 0 0 0 2px var(--line2); font-weight:600}
+.btn.ghost:hover{box-shadow:inset 0 0 0 2px var(--muted); filter:none}
+.btn.lav{background:var(--lav)}
+.btn.sm{padding:8px 14px; font-size:14px; font-weight:700}
+.btn.icon{padding:10px; width:42px; height:42px}
+
+/* ================= earn home ================= */
+.home{min-height:100dvh; background:radial-gradient(120% 60% at 50% -10%,#3A2140 0%,var(--bg) 55%)}
+.home .topbar{border-bottom:0}
+.wallet{display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:999px; background:var(--panel2); font-weight:800; font-size:15px}
+.wallet span{color:var(--ok)}
+.hwrap{max-width:560px; margin:0 auto; padding:18px 20px 48px}
+.home h1{font-size:clamp(40px,10.5vw,60px); line-height:.96; letter-spacing:-.04em; font-weight:800; margin:10px 0 14px}
+.home h1 em{font-style:normal; color:var(--ok)}
+.home .lede{color:var(--muted); font-size:17.5px; margin:0 0 24px; max-width:44ch}
+.feat{background:var(--panel); border:1px solid var(--line); border-radius:28px; overflow:hidden}
+.feat .pic{position:relative; aspect-ratio:16/9; background:#222 center/cover no-repeat}
+.feat .pay{position:absolute; top:14px; left:14px; background:var(--ok); color:#10260F; font-weight:800; font-size:16px; padding:7px 13px; border-radius:999px; box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.feat .live{position:absolute; top:14px; right:14px; background:rgba(0,0,0,.55); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); font-weight:700; font-size:13px; padding:6px 11px; border-radius:999px}
+.feat .body{padding:18px 20px 20px}
+.feat h2{margin:0; font-size:24px; letter-spacing:-.02em; font-weight:800}
+.feat .meta{color:var(--muted); font-size:14.5px; margin:2px 0 16px}
+.how{display:grid; gap:10px; margin:28px 0 0}
+.how > div{display:flex; gap:14px; align-items:center; padding:14px 16px; background:var(--panel); border-radius:18px; border:1px solid var(--line)}
+.how i{font-style:normal; font-size:24px; width:44px; height:44px; flex:none; display:grid; place-items:center; background:var(--panel2); border-radius:14px}
+.how b{display:block; font-size:16px} .how span{color:var(--muted); font-size:14px}
+.soon{margin-top:28px} .soon h3{font-size:15px; color:var(--muted); font-weight:600; margin:0 0 10px}
+.soon .it{display:flex; align-items:center; gap:14px; padding:12px; background:var(--panel); border-radius:18px; border:1px solid var(--line); opacity:.75}
+.soon .it .ph2{width:76px; height:48px; border-radius:10px; flex:none; background:linear-gradient(150deg,#1F3A2A,#0E1A12); display:grid; place-items:center; font-size:22px}
+.soon .it b{display:block} .soon .it span{color:var(--muted); font-size:13.5px}
+.soon .it em{margin-left:auto; font-style:normal; font-weight:800; color:var(--ok); white-space:nowrap}
+.foot{margin-top:30px; color:var(--dim); font-size:12.5px; text-align:center}
+.foot button{background:none; border:0; color:var(--lav); text-decoration:underline; text-underline-offset:3px; font-size:inherit; padding:0}
+.earn{position:relative; border-radius:28px; padding:22px; margin:0 0 14px; text-align:left; background:linear-gradient(150deg,#1D3A24,#14201A 70%); border:1px solid rgba(139,227,155,.25); overflow:hidden}
+.earn.no{background:linear-gradient(150deg,#3A2026,#1E1418 70%); border-color:rgba(255,92,122,.25)}
+.earn .amt{font-size:clamp(56px,17vw,80px); font-weight:800; letter-spacing:-.05em; line-height:.95; color:var(--ok)}
+.earn.no .amt{color:var(--drift)}
+.earn .v{display:inline-flex; gap:6px; align-items:center; font-weight:700; font-size:14px; margin-top:8px; color:var(--ok)}
+.earn.no .v{color:#FFB3B3}
+.earn .bal{display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:14px; border-top:1px solid rgba(255,255,255,.1); font-size:15px; color:var(--muted)}
+.earn .bal b{color:var(--ink); font-size:18px}
+.coin{position:absolute; font-size:26px; top:-30px; animation:fall 1.6s ease-in forwards; pointer-events:none}
+@keyframes fall{to{transform:translateY(260px) rotate(200deg); opacity:0}}
+@media (prefers-reduced-motion:reduce){.coin{display:none}}
+
+/* ================= studio ================= */
+.topbar{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px clamp(16px,3vw,32px); border-bottom:1px solid var(--line)}
+.logo{display:flex; align-items:center; gap:10px; font-weight:800; font-size:20px; letter-spacing:-.02em}
+.logo i{width:26px; height:26px; border-radius:9px; background:radial-gradient(circle at 35% 30%,#FFB48F,var(--pop) 50%,#B23E7B); display:block}
+.logo small{font-weight:600; font-size:13px; color:var(--muted); padding:3px 9px; border-radius:999px; background:var(--panel2)}
+.studio{max-width:1180px; margin:0 auto; padding:28px clamp(16px,3vw,32px) 60px; display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:24px; align-items:start}
+@media (max-width:880px){.studio{grid-template-columns:minmax(0,1fr)}}
+.studio h1{grid-column:1/-1; margin:0; font-size:clamp(32px,5vw,48px); line-height:1; letter-spacing:-.03em; font-weight:800}
+.studio .intro{grid-column:1/-1; margin:-10px 0 0; color:var(--muted); max-width:62ch}
+.card{background:var(--panel); border-radius:24px; padding:22px; border:1px solid var(--line)}
+.card + .card{margin-top:16px}
+.card h2{margin:0 0 4px; font-size:21px; letter-spacing:-.02em; font-weight:800}
+.card .hint{margin:0 0 14px; color:var(--muted); font-size:14.5px}
+.drop{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; text-align:center; padding:26px 16px; border-radius:18px;
+  border:2px dashed var(--line2); background:var(--panel2); cursor:pointer; transition:border-color .15s, background .15s}
+.drop:hover,.drop.over{border-color:var(--pop); background:#2B2026}
+.drop b{font-size:17px} .drop span{color:var(--muted); font-size:14px}
+.drop input{position:absolute; width:1px; height:1px; opacity:0}
+.drop:focus-within{outline:3px solid var(--lav); outline-offset:2px}
+.or{display:flex; align-items:center; gap:10px; color:var(--dim); font-size:13px; margin:12px 0}
+.or::before,.or::after{content:""; flex:1; height:1px; background:var(--line)}
+.row{display:flex; gap:8px} .row > *{min-width:0}
+.inp{width:100%; padding:12px 14px; border-radius:14px; border:2px solid transparent; background:var(--panel2); font-size:15.5px}
+.inp:focus{outline:none; border-color:var(--lav)}
+label.lbl{display:block; font-size:13.5px; color:var(--muted); margin:12px 0 6px}
+.film-pill{display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:16px; background:#2A2230; margin-top:12px}
+.film-pill b{display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.film-pill span{color:var(--muted); font-size:13.5px}
+.film-pill .x{margin-left:auto; background:none; border:0; color:var(--muted); font-size:13.5px; text-decoration:underline; text-underline-offset:3px}
+.msg-err{color:#FFB3B3; font-size:14px; margin:8px 0 0; min-height:0}
+.people{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px}
+.person{display:inline-flex; align-items:center; gap:8px; padding:6px 6px 6px 12px; border-radius:999px; background:var(--panel3); font-size:14px}
+.person em{font-style:normal; color:var(--muted)}
+.person button{border:0; background:rgba(0,0,0,.25); width:24px; height:24px; border-radius:50%; color:var(--muted); line-height:1}
+.toggles{display:grid; gap:2px}
+.tog{display:flex; align-items:center; gap:14px; padding:11px 2px; border-bottom:1px solid var(--line); cursor:pointer}
+.tog:last-child{border-bottom:0}
+.tog div{flex:1} .tog b{display:block; font-weight:600; font-size:15.5px} .tog span{color:var(--muted); font-size:13.5px}
+.tog input{appearance:none; -webkit-appearance:none; width:46px; height:28px; border-radius:999px; background:var(--panel3); position:relative; flex:none; cursor:pointer; transition:background .15s}
+.tog input::after{content:""; position:absolute; top:3px; left:3px; width:22px; height:22px; border-radius:50%; background:var(--ink); transition:transform .15s}
+.tog input:checked{background:var(--ok)} .tog input:checked::after{transform:translateX(18px); background:#14301A}
+.tog select{background:var(--panel3); border:0; border-radius:10px; padding:6px 10px}
+.honest{margin:12px 0 0; padding:12px 14px; border-radius:14px; background:#2A2230; color:var(--muted); font-size:13.5px}
+.honest b{color:var(--ink)}
+.create{margin-top:18px}
+.inv{display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid var(--line)}
+.inv:last-child{border-bottom:0}
+.av{width:38px; height:38px; flex:none; border-radius:50%; display:grid; place-items:center; font-weight:800; color:var(--pop-ink)}
+.inv .who{flex:1; min-width:0} .inv .who b{display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.inv .who span{font-size:13px; color:var(--muted)}
+.inv .acts{display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end}
+.status{font-size:12.5px; font-weight:700; padding:3px 9px; border-radius:999px; background:var(--panel3); color:var(--muted)}
+.status.done{background:#1E3524; color:var(--ok)}
+.empty{color:var(--dim); font-size:14.5px; padding:14px 0 4px}
+.sample{display:flex; gap:14px; align-items:center; cursor:pointer; text-align:left; width:100%; border:0; background:linear-gradient(135deg,#3A2647,#241C2B); border-radius:20px; padding:16px}
+.sample .thumb{width:84px; height:56px; border-radius:12px; flex:none; background:linear-gradient(160deg,#7e2553,#1d2b53); display:grid; place-items:center; font-size:26px}
+.sample b{display:block; font-size:16.5px} .sample span{color:var(--muted); font-size:13.5px}
+.file-link{position:relative; display:inline-block}
+.file-link input{position:absolute; inset:0; opacity:0; cursor:pointer}
+.toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:var(--ink); color:var(--pop-ink); padding:10px 18px; border-radius:999px; font-weight:700; font-size:14.5px; z-index:99; box-shadow:0 10px 30px rgba(0,0,0,.4)}
+
+/* ================= viewer ================= */
+.vscreen{min-height:100dvh; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:28px 20px 40px; text-align:center;
+  background:radial-gradient(120% 70% at 50% 0%,#2A1B30 0%,var(--bg) 60%)}
+.vinner{width:100%; max-width:440px}
+.vscreen h1{font-size:clamp(38px,10.5vw,56px); line-height:.98; font-weight:800; letter-spacing:-.035em; margin:0 0 14px}
+.vscreen h2{font-size:clamp(30px,8vw,40px); line-height:1.02; font-weight:800; letter-spacing:-.025em; margin:0 0 12px}
+.vscreen p{color:var(--muted); margin:0 0 12px; font-size:16.5px}
+.vscreen .stack{display:grid; gap:12px; margin-top:22px}
+.ticket{position:relative; border-radius:26px; overflow:hidden; margin:0 0 22px; text-align:left; background:var(--panel); border:1px solid var(--line)}
+.ticket .poster{aspect-ratio:16/9; background:#000; position:relative}
+.ticket canvas,.ticket img{width:100%; height:100%; object-fit:cover; display:block}
+.ticket .poster::after{content:""; position:absolute; inset:0; background:linear-gradient(transparent 40%,rgba(18,16,20,.95))}
+.ticket .tt{position:absolute; left:18px; right:18px; bottom:14px; z-index:1}
+.ticket .tt small{display:block; color:var(--lav); font-weight:600; font-size:13.5px}
+.ticket .tt b{display:block; font-size:28px; line-height:1.05; letter-spacing:-.02em; font-weight:800}
+.ticket .perf{display:flex; justify-content:space-between; padding:12px 18px 14px; border-top:2px dashed var(--line2); font-size:13.5px; color:var(--muted)}
+.ticket .perf b{color:var(--ink); font-weight:700}
+.rules{text-align:left; display:grid; gap:10px; margin:4px 0 0}
+.rule{display:flex; gap:12px; align-items:flex-start; font-size:15px; color:var(--ink)}
+.rule i{font-style:normal; width:30px; height:30px; flex:none; display:grid; place-items:center; border-radius:10px; background:var(--panel2); font-size:16px}
+.agree{display:flex; gap:12px; align-items:flex-start; text-align:left; margin-top:18px; padding:14px; border-radius:16px; background:var(--panel); cursor:pointer; font-size:14.5px; color:var(--muted)}
+.agree input{width:22px; height:22px; flex:none; accent-color:var(--pop); margin:1px 0 0}
+.camframe{position:relative; width:min(76vw,300px); aspect-ratio:3/4; margin:0 auto 16px; border-radius:28px; overflow:hidden; background:var(--panel2); border:3px solid var(--line2); transition:border-color .3s}
+.camframe.ok{border-color:var(--ok)} .camframe.bad{border-color:var(--warn)}
+.camframe canvas{width:100%; height:100%; display:block}
+.chip{display:inline-flex; align-items:center; gap:8px; padding:9px 16px; border-radius:999px; font-weight:700; font-size:15px; background:var(--panel2); color:var(--muted); margin-bottom:6px}
+.chip .dot{width:10px; height:10px; border-radius:50%; background:var(--muted)}
+.chip.ok{color:var(--ok)} .chip.ok .dot{background:var(--ok); animation:pulse 1.6s infinite}
+.chip.bad{color:var(--warn)} .chip.bad .dot{background:var(--warn)}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.5}}
+@media (prefers-reduced-motion:reduce){.chip .dot{animation:none!important}}
+.err{background:#3A1F2C; color:#FFB3B3; border-radius:16px; padding:14px 16px; text-align:left; font-size:15px; margin-top:14px}
+#camVideo{position:fixed; width:2px; height:2px; opacity:.01; pointer-events:none; left:0; top:0}
+
+/* stage */
+.stage{position:fixed; inset:0; background:#000; z-index:20; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none}
+.stage video{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:#000}
+.wm-tile{position:absolute; inset:0; pointer-events:none; opacity:.07; background-repeat:repeat}
+.wm{position:absolute; pointer-events:none; color:#fff; opacity:.22; font-weight:700; font-size:clamp(12px,1.6vw,16px); text-shadow:0 1px 2px #000; transition:top 1.2s ease, left 1.2s ease; white-space:nowrap}
+.ctrls{position:absolute; left:0; right:0; bottom:0; padding:40px clamp(14px,3vw,28px) calc(18px + env(safe-area-inset-bottom)); background:linear-gradient(transparent,rgba(0,0,0,.85)); transition:opacity .3s}
+.ctrls.hide{opacity:0; pointer-events:none}
+.ctrls .bar{height:5px; border-radius:99px; background:rgba(255,255,255,.18); overflow:hidden; margin-bottom:14px}
+.ctrls .bar i{display:block; height:100%; width:0; background:var(--pop)}
+.ctrls .line{display:flex; align-items:center; gap:12px; color:#ddd; font-size:14.5px}
+.ctrls .line .sp{flex:1}
+.ctrls .rec{display:inline-flex; align-items:center; gap:7px; color:#bbb}
+.ctrls .rec::before{content:""; width:8px; height:8px; border-radius:50%; background:#E0475B; animation:pulse 2s infinite}
+.cbtn{background:rgba(255,255,255,.12); border:0; color:#fff; border-radius:999px; padding:9px 16px; font-weight:700; font-size:14px}
+.cbtn:hover{background:rgba(255,255,255,.2)}
+.cbtn.warnb{background:rgba(224,71,91,.25)}
+.overlay{position:absolute; inset:0; display:grid; place-items:center; background:rgba(0,0,0,.72); text-align:center; padding:24px; z-index:3}
+.overlay .box{max-width:420px}
+.overlay h3{font-size:30px; line-height:1.05; letter-spacing:-.02em; margin:0 0 10px; font-weight:800}
+.overlay p{color:#bbb; margin:0 0 20px}
+.facewarn{position:absolute; top:calc(16px + env(safe-area-inset-top)); left:50%; transform:translateX(-50%); background:rgba(255,200,87,.15); color:var(--warn); padding:8px 16px; border-radius:999px; font-size:14px; font-weight:700; z-index:2}
+
+/* recap */
+.recap{background:linear-gradient(160deg,#3A2647,#251B2C 60%); border-radius:30px; padding:26px 22px; text-align:left; border:1px solid var(--line); position:relative; overflow:hidden}
+.recap::before{content:""; position:absolute; right:-70px; top:-70px; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle,rgba(255,122,69,.55),transparent 70%)}
+.recap .eb{font-size:14px; color:var(--lav); font-weight:600; margin-bottom:4px; position:relative}
+.recap .big{font-size:clamp(64px,20vw,92px); font-weight:800; letter-spacing:-.05em; line-height:.95; position:relative}
+.recap .big small{font-size:.4em; color:var(--pop); margin-left:2px}
+.recap .sub{color:var(--muted); font-size:15.5px; margin:6px 0 18px}
+.emo-row{display:grid; grid-template-columns:repeat(5,1fr); gap:8px}
+.emo{background:rgba(0,0,0,.28); border-radius:16px; padding:10px 4px 8px; text-align:center}
+.emo i{font-style:normal; font-size:22px; display:block} .emo b{display:block; font-size:22px; font-weight:800; line-height:1.1} .emo span{font-size:11.5px; color:var(--muted)}
+
+/* survey + profile */
+.steps{display:flex; gap:5px; margin:0 0 22px}
+.steps i{flex:1; height:4px; border-radius:9px; background:var(--panel3)} .steps i.on{background:var(--pop)}
+.opts{display:grid; gap:10px; margin-top:18px}
+.opt{display:flex; align-items:center; gap:14px; padding:15px 18px; border-radius:18px; background:var(--panel); border:2px solid var(--line); text-align:left; font-weight:700; font-size:17px; transition:border-color .15s, background .15s, transform .12s}
+.opt i{font-style:normal; font-size:26px; line-height:1}
+.opt:hover{border-color:var(--muted)} .opt:active{transform:scale(.98)} .opt.on{border-color:var(--pop); background:#2B2026}
+.qg{margin:18px 0 0; text-align:left} .qg > b{display:block; margin-bottom:8px; font-size:15px}
+.chips{display:flex; flex-wrap:wrap; gap:8px}
+.chips button{padding:10px 15px; border-radius:999px; background:var(--panel); border:2px solid var(--line); font-weight:700; font-size:15px}
+.chips button[aria-pressed="true"]{background:var(--pop); color:var(--pop-ink); border-color:var(--pop)}
+.pick{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px}
+.pick button{position:relative; border:3px solid transparent; border-radius:16px; overflow:hidden; padding:0; background:#000; aspect-ratio:16/9}
+.pick button canvas{width:100%; height:100%; display:block}
+.pick button span{position:absolute; left:6px; bottom:5px; font-size:12px; font-weight:800; background:rgba(0,0,0,.65); padding:2px 8px; border-radius:99px; color:#fff}
+.pick button.on{border-color:var(--pop)}
+.pick button.on::after{content:"✓"; position:absolute; top:6px; right:6px; background:var(--pop); color:var(--pop-ink); width:24px; height:24px; border-radius:50%; display:grid; place-items:center; font-weight:800}
+.linkbtn{background:none; border:0; color:var(--muted); text-decoration:underline; text-underline-offset:3px; font-size:14.5px; padding:6px}
+
+/* ================= results editor ================= */
+.rs{min-height:100dvh; display:flex; flex-direction:column; background:#0E0D10}
+.rs-top{display:flex; align-items:center; gap:12px; padding:12px clamp(12px,2vw,20px); border-bottom:1px solid var(--line); flex-wrap:wrap}
+.rs-top .t{flex:1; min-width:180px}
+.rs-top .t b{display:block; font-size:18px; letter-spacing:-.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.rs-top .t span{color:var(--muted); font-size:13.5px}
+.rs-top .acts{display:flex; gap:8px; flex-wrap:wrap}
+.rs-stats{display:flex; gap:10px; padding:12px clamp(12px,2vw,20px) 0; overflow-x:auto; scrollbar-width:none}
+.rs-stats::-webkit-scrollbar{display:none}
+.stat{flex:none; background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:10px 14px; min-width:128px}
+.stat b{display:block; font-size:24px; font-weight:800; letter-spacing:-.03em; line-height:1.1}
+.stat span{font-size:12.5px; color:var(--muted)}
+.stat.hot{background:linear-gradient(140deg,#3A1A16,#1B181F)} .stat.hot b{color:#FF8A5C}
+.rs-mid{display:grid; grid-template-columns:minmax(0,1.7fr) minmax(280px,1fr); gap:12px; padding:12px clamp(12px,2vw,20px)}
+@media (max-width:860px){.rs-mid{grid-template-columns:minmax(0,1fr)}}
+.pv{position:relative; background:#000; border-radius:18px; overflow:hidden; aspect-ratio:16/9; align-self:start}
+.pv video,.pv canvas{position:absolute; inset:0; width:100%; height:100%; object-fit:contain; display:block}
+.pv .tc{position:absolute; left:12px; top:12px; background:rgba(0,0,0,.6); border-radius:999px; padding:4px 11px; font-weight:700; font-size:14px}
+.pv .now{position:absolute; left:12px; right:12px; bottom:12px; display:flex; flex-wrap:wrap; gap:6px}
+.pv .now span{background:rgba(0,0,0,.66); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); border-radius:999px; padding:5px 11px; font-size:13.5px; font-weight:700}
+.moments{background:var(--panel); border:1px solid var(--line); border-radius:18px; display:flex; flex-direction:column; min-height:0; max-height:min(56vw,520px)}
+@media (max-width:860px){.moments{max-height:340px}}
+.moments header{padding:14px 14px 8px}
+.moments header b{font-size:17px}
+.filters{display:flex; gap:6px; padding:0 14px 10px; overflow-x:auto; scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.filters button{flex:none; border:0; background:var(--panel2); border-radius:999px; padding:6px 11px; font-size:14px; font-weight:600; color:var(--muted)}
+.filters button[aria-pressed="true"]{background:var(--ink); color:var(--pop-ink)}
+.mlist{overflow-y:auto; padding:0 8px 8px; flex:1}
+.mom{display:flex; gap:10px; align-items:center; width:100%; text-align:left; border:0; background:none; padding:8px 6px; border-radius:14px}
+.mom:hover{background:var(--panel2)} .mom.on{background:var(--panel3)}
+.mom .th{position:relative; width:84px; height:47px; border-radius:10px; overflow:hidden; flex:none; background:#000}
+.mom .th canvas{width:100%; height:100%; display:block}
+.mom .th i{position:absolute; right:3px; bottom:2px; font-style:normal; font-size:17px; filter:drop-shadow(0 1px 2px #000)}
+.mom .tx{min-width:0; flex:1}
+.mom .tx b{display:block; font-size:14.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.mom .tx span{display:block; font-size:12.5px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.mom .tm{font-weight:800; font-size:14px; flex:none}
+.transport{display:flex; align-items:center; gap:12px; padding:4px clamp(12px,2vw,20px) 8px}
+.transport .time{font-weight:800; font-size:16px} .transport .time span{color:var(--dim); font-weight:600}
+.transport .sp{flex:1}
+.play{width:44px; height:44px; border-radius:50%; border:0; background:var(--ink); color:var(--pop-ink); font-size:16px; display:grid; place-items:center}
+.zoom{display:flex; align-items:center; gap:8px; color:var(--muted); font-size:18px}
+.zoom input{width:min(160px,30vw); accent-color:var(--ink)}
+.tl{display:grid; grid-template-columns:48px minmax(0,1fr); margin:0 clamp(12px,2vw,20px) 18px; background:#151318; border:1px solid var(--line); border-radius:18px; overflow:hidden}
+.tl-labels{position:relative; border-right:1px solid var(--line); background:#151318}
+.tl-labels div{position:absolute; left:0; right:0; display:grid; place-items:center; font-size:18px}
+.tl-labels div small{font-size:9.5px; color:var(--dim); font-weight:600; display:block; margin-top:-3px}
+.tl-main{position:relative}
+.tl-main canvas{position:absolute; inset:0; pointer-events:none}
+.tl-scroll{position:absolute; inset:0; overflow-x:auto; overflow-y:hidden; cursor:crosshair; scrollbar-color:#3a3540 transparent}
+.tl-inner{position:relative; height:100%}
+.mk{position:absolute; transform:translate(-50%,-50%); border:0; padding:0; background:none; font-size:17px; line-height:1; width:26px; height:26px; border-radius:50%; display:grid; place-items:center;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.7)); transition:transform .12s; z-index:2}
+.mk:hover,.mk:focus-visible{transform:translate(-50%,-50%) scale(1.3); z-index:3}
+.mk.on{background:rgba(255,255,255,.18); box-shadow:0 0 0 2px #fff}
+.mk.fire{font-size:19px}
+.ph{position:absolute; top:0; bottom:0; width:2px; margin-left:-1px; background:#fff; pointer-events:none; z-index:4; box-shadow:0 0 0 1px rgba(0,0,0,.4)}
+.ph::before{content:""; position:absolute; top:0; left:50%; width:14px; height:14px; transform:translate(-50%,0) rotate(45deg); border-radius:3px; background:#fff; margin-top:-7px}
+.prog{color:var(--muted); font-size:13px}
+.segbar{display:flex; gap:6px; padding:12px clamp(12px,2vw,20px) 0; overflow-x:auto; scrollbar-width:none; align-items:center}
+.segbar::-webkit-scrollbar{display:none}
+.segbar > span{color:var(--muted); font-size:13px; margin-right:4px; flex:none}
+.segbar button{flex:none; border:0; background:var(--panel); border-radius:999px; padding:7px 13px; font-weight:700; font-size:13.5px; color:var(--muted); box-shadow:inset 0 0 0 1px var(--line)}
+.segbar button small{font-weight:600; opacity:.7; margin-left:3px}
+.segbar button[aria-pressed="true"]{background:var(--lav); color:var(--pop-ink); box-shadow:none}
+.rhead{padding:6px clamp(12px,2vw,20px) 10px; display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+.rhead h2{margin:0; font-size:24px; letter-spacing:-.02em} .rhead span{color:var(--muted); font-size:14px}
+.report{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; padding:0 clamp(12px,2vw,20px) 32px}
+@media (max-width:1050px){.report{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:700px){.report{grid-template-columns:minmax(0,1fr)}}
+.rcard{background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:18px; min-width:0}
+.rcard.wide{grid-column:1/-1}
+.rcard h3{margin:0; font-size:17px; letter-spacing:-.01em} .rcard .q{color:var(--muted); font-size:13.5px; margin:2px 0 12px}
+.bigstat{font-size:46px; font-weight:800; letter-spacing:-.045em; line-height:1}
+.bigstat small{font-size:15px; letter-spacing:0; color:var(--muted); font-weight:600; margin-left:6px}
+.hbar{display:flex; height:28px; border-radius:9px; overflow:hidden; margin:14px 0 10px; background:var(--panel2)}
+.hbar div{display:grid; place-items:center; font-size:12.5px; font-weight:800; color:var(--pop-ink); min-width:0; overflow:hidden; white-space:nowrap}
+.lg{display:flex; flex-wrap:wrap; gap:4px 14px; font-size:13px; color:var(--muted)}
+.lg i{display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:5px; vertical-align:-1px}
+.lg b{color:var(--ink)}
+.note{font-size:13.5px; color:var(--muted); margin:12px 0 0; padding-top:12px; border-top:1px solid var(--line)}
+.note b{color:var(--ink)}
+.none{color:var(--dim); font-size:14px}
+.tscroll{overflow-x:auto}
+table.segt{width:100%; border-collapse:collapse; font-size:14.5px; min-width:560px}
+.segt th{text-align:left; font-weight:600; color:var(--muted); font-size:12.5px; padding:6px 10px 8px 0; border-bottom:1px solid var(--line)}
+.segt td{padding:10px 10px 10px 0; border-bottom:1px solid var(--line)}
+.segt tr:last-child td{border-bottom:0}
+.segt tbody tr{cursor:pointer} .segt tbody tr:hover td{background:rgba(255,255,255,.03)}
+.segt tr.on td{background:rgba(201,184,255,.08)}
+.segt .best{color:var(--ok); font-weight:800} .segt .worst{color:var(--drift); font-weight:800}
+.segt .meter{display:inline-block; width:56px; height:6px; border-radius:9px; background:var(--panel3); margin-left:8px; vertical-align:middle; overflow:hidden}
+.segt .meter i{display:block; height:100%; background:var(--pop)}
+.stuckl{display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px}
+.stuckl button{border:0; padding:0; background:none; text-align:left}
+.stuckl .th{position:relative; aspect-ratio:16/9; border-radius:12px; overflow:hidden; background:#000}
+.stuckl canvas{width:100%; height:100%; display:block}
+.stuckl .th b{position:absolute; left:6px; top:6px; background:rgba(0,0,0,.65); border-radius:99px; padding:2px 8px; font-size:12.5px}
+.stuckl span{display:block; font-size:13px; color:var(--muted); margin-top:5px}
+.notes .nhead{display:flex; gap:12px; justify-content:space-between; align-items:flex-start; flex-wrap:wrap}
+.nsrc{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.badge{font-size:12.5px; font-weight:700; padding:4px 10px; border-radius:999px; background:var(--panel3); color:var(--muted)}
+.badge.ai{background:linear-gradient(90deg,#3B2A55,#4A2A3A); color:#E9DDFF}
+.ask{border:0; border-radius:999px; padding:9px 15px; font-weight:800; font-size:14px; background:linear-gradient(90deg,#C9B8FF,#FFB48F); color:var(--pop-ink)}
+.ask:disabled{opacity:.55; cursor:not-allowed}
+.askhint{font-size:12.5px; color:var(--dim); max-width:34ch}
+.nlist{list-style:none; margin:4px 0 0; padding:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px}
+@media (max-width:900px){.nlist{grid-template-columns:minmax(0,1fr)}}
+.ni{background:var(--panel2); border-radius:16px; padding:14px 16px; border-left:4px solid var(--dim)}
+.ni.p1{border-left-color:var(--fire)} .ni.p2{border-left-color:var(--warn)} .ni.p3{border-left-color:var(--lav)}
+.ni .ntop{display:flex; gap:6px; align-items:center; margin-bottom:6px; flex-wrap:wrap}
+.ni .area{font-size:12px; font-weight:800; padding:3px 9px; border-radius:999px; background:rgba(255,255,255,.08)}
+.ni .cf{font-size:12px; color:var(--dim)}
+.ni .cf.low::before{content:"● "; color:var(--drift)} .ni .cf.medium::before{content:"● "; color:var(--warn)} .ni .cf.high::before{content:"● "; color:var(--ok)}
+.ni b{display:block; font-size:16.5px; letter-spacing:-.01em; margin-bottom:4px}
+.ni p{margin:0; color:#D8CFDC; font-size:14.5px; line-height:1.5}
+.ev{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px}
+.ev button{border:0; background:rgba(255,255,255,.08); border-radius:999px; padding:5px 10px; font-size:12.5px; font-weight:700; color:var(--ink)}
+.ev button:hover{background:rgba(255,255,255,.16)}
+.nload{display:flex; align-items:center; gap:10px; color:var(--muted); font-size:14.5px; padding:14px 0}
+.nload i{width:16px; height:16px; border-radius:50%; border:2px solid var(--lav); border-right-color:transparent; animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.scn{width:100%; border-collapse:collapse; font-size:14px; min-width:640px}
+.scn td{padding:9px 10px 9px 0; border-bottom:1px solid var(--line); vertical-align:middle}
+.scn tr:last-child td{border-bottom:0}
+.scn tbody tr{cursor:pointer} .scn tbody tr:hover td{background:rgba(255,255,255,.03)}
+.scn th{text-align:left; font-weight:600; color:var(--muted); font-size:12.5px; padding:6px 10px 8px 0; border-bottom:1px solid var(--line)}
+.scn canvas{width:96px; height:54px; border-radius:8px; display:block}
+.scn .tt b{display:block} .scn .tt > span{display:block; color:var(--muted); font-size:12.5px; max-width:42ch; margin-top:2px}
+.scn .best{color:var(--ok); font-weight:800} .scn .worst{color:var(--drift); font-weight:800}
+.tone{font-size:11.5px; font-weight:700; padding:2px 8px; border-radius:999px; background:var(--panel3); color:var(--muted); white-space:nowrap}
+.words{display:flex; flex-wrap:wrap; gap:4px 12px; align-items:baseline; margin-top:4px}
+.words span{font-weight:800; letter-spacing:-.02em; line-height:1.15}
+</style>
+</head>
+<body>
+<video id="camVideo" playsinline muted autoplay></video>
+
+<!-- ================= STUDIO ================= -->
+<div class="home" id="v-home" hidden>
+  <div class="topbar">
+    <div class="logo"><i aria-hidden="true"></i>Screentest</div>
+    <div class="wallet" aria-label="Your balance">💸 <span id="walletAmt">$0.00</span></div>
+  </div>
+  <div class="hwrap">
+    <h1>get paid to watch movies <em>before anyone else.</em></h1>
+    <p class="lede">Studios pay for honest reactions. Watch a screening with your camera on, answer five quick questions, and get paid.</p>
+    <div class="feat">
+      <div class="pic" id="featPic"><span class="pay" id="featPay">+$2.00</span><span class="live">🟢 open now</span></div>
+      <div class="body">
+        <h2>Caminandes 3: Llamigos</h2>
+        <p class="meta">Comedy · 2 min 30 s · from Blender Studio</p>
+        <button class="btn block" id="earnGo">watch &amp; earn $2</button>
+      </div>
+    </div>
+    <div class="how">
+      <div><i>🎬</i><div><b>Watch the screening</b><span>Straight through, like you're at the movies.</span></div></div>
+      <div><i>👀</i><div><b>Your camera reads the room</b><span>It notices laughs and drifting. No video is saved.</span></div></div>
+      <div><i>💸</i><div><b>Get paid when you finish</b><span>Finish the film with eyes on screen to verify your watch.</span></div></div>
+    </div>
+    <div class="soon">
+      <h3>Opening soon</h3>
+      <div class="it"><span class="ph2">🍄</span><div><b>Sprite Fright</b><span>Horror-comedy · 10 min</span></div><em>$6.00</em></div>
+    </div>
+    <p class="foot">Concept demo: payouts aren't live yet. Caminandes 3: Llamigos © Blender Foundation, CC BY 3.0.<br><button id="toStudio">I'm a studio, show me the studio side</button></p>
+  </div>
+</div>
+
+<div id="v-studio">
+  <div class="topbar">
+    <div class="logo"><i aria-hidden="true"></i>Screentest <small>studio</small></div>
+    <button class="btn sm ghost" id="toHome">Viewer app</button>
+  </div>
+  <main class="studio">
+    <h1>Screen your cut, see every reaction.</h1>
+    <p class="intro">Upload a cut, invite your test audience, and get a timeline of where they laughed, gasped, got lost or reached for their phone.</p>
+
+    <section>
+      <div class="card">
+        <h2>Your cut</h2>
+        <p class="hint">The film stays on this device in this prototype. Use a hosted link to let invites work on other devices.</p>
+        <label class="drop" id="drop">
+          <input type="file" id="filmFile" accept="video/*">
+          <span style="font-size:30px" aria-hidden="true">🎬</span>
+          <b>Drop your film here</b>
+          <span>or click to choose a video file</span>
+        </label>
+        <div class="or">or use a hosted link</div>
+        <div class="row">
+          <input class="inp" id="filmUrl" placeholder="https://…/my-cut.mp4" inputmode="url" autocomplete="off">
+          <button class="btn sm ghost" id="useUrl">Use link</button>
+        </div>
+        <p class="hint" style="margin:10px 0 0">No cut handy? <button class="linkbtn" id="useSample" style="padding:0; color:var(--lav)">Use a free sample film</button> (Caminandes 3: Llamigos, 2:30 comedy)</p>
+        <div class="film-pill" id="filmPill" hidden>
+          <span style="font-size:24px" aria-hidden="true">🎞️</span>
+          <div style="min-width:0"><b id="filmName"></b><span id="filmMeta"></span></div>
+          <button class="x" id="filmClear">Change</button>
+        </div>
+        <p class="msg-err" id="filmErr"></p>
+        <label class="lbl" for="title">Title</label>
+        <input class="inp" id="title" placeholder="Landlord, cut 3" autocomplete="off">
+        <label class="lbl" for="studioName">From</label>
+        <input class="inp" id="studioName" placeholder="Your studio or name" autocomplete="off">
+      </div>
+
+      <div class="card">
+        <h2>Who's watching</h2>
+        <p class="hint">Each person gets their own link, and their name is watermarked on the film.</p>
+        <div class="row">
+          <input class="inp" id="pName" placeholder="Name" autocomplete="off">
+          <input class="inp" id="pEmail" placeholder="Email" inputmode="email" autocomplete="off">
+          <button class="btn sm" id="pAdd">Add</button>
+        </div>
+        <p class="msg-err" id="pErr"></p>
+        <div class="people" id="people"></div>
+      </div>
+
+      <div class="card">
+        <h2>Protection</h2>
+        <div class="toggles">
+          <label class="tog"><div><b>Watermark each viewer</b><span>Their name and email float over the film, so any leak traces back.</span></div><input type="checkbox" id="optWm" checked></label>
+          <label class="tog"><div><b>Pause when they leave the tab</b><span>Switching apps or tabs stops the film.</span></div><input type="checkbox" id="optLeave" checked></label>
+          <label class="tog"><div><b>Camera on to watch</b><span>The film won't start until we can see them.</span></div><input type="checkbox" id="optCam" checked></label>
+          <label class="tog"><div><b>Link expires</b><span>No skipping ahead and no downloading either way.</span></div>
+            <select id="optExp"><option value="24">in 24 hours</option><option value="48" selected>in 48 hours</option><option value="168">in 7 days</option></select></label>
+        </div>
+        <p class="honest"><b>Prototype note:</b> a browser alone can't fully stop screen recording. Production hosting with DRM turns recordings black. See the setup notes that came with this file.</p>
+        <button class="btn block create" id="create">Create invite links</button>
+        <p class="msg-err" id="createErr"></p>
+      </div>
+    </section>
+
+    <aside>
+      <div class="card">
+        <h2>Invites</h2>
+        <div id="invites"><p class="empty">Invite links show up here once you create them.</p></div>
+      </div>
+      <div class="card">
+        <h2>Results</h2>
+        <p class="hint" id="resHint">Results unlock after the first person finishes watching.</p>
+        <div class="row" style="flex-wrap:wrap">
+          <button class="btn sm" id="openRes" disabled>Open results</button>
+          <span class="file-link btn sm ghost">Import reaction files<input type="file" id="importFiles" accept=".json,application/json" multiple></span>
+        </div>
+        <p class="msg-err" id="importMsg"></p>
+      </div>
+      <div class="card" style="padding:14px">
+        <button class="sample" id="openDemo">
+          <span class="thumb" aria-hidden="true">🔥</span>
+          <div><b>See a sample screening</b><span>14 viewers watching a 22-minute short. Simulated data.</span></div>
+        </button>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<!-- ================= VIEWER: invite ================= -->
+<section class="vscreen" id="v-invite" hidden>
+  <div class="vinner">
+    <div class="ticket">
+      <div class="poster"><canvas id="poster" width="640" height="360"></canvas>
+        <div class="tt"><small id="tFrom"></small><b id="tTitle"></b></div></div>
+      <div class="perf"><span>Admit <b id="tName"></b></span><span id="tExp"></span></div>
+    </div>
+    <h2>you're on the<br>test audience.</h2>
+    <p>Watch it like you normally would. Your reactions shape the final cut.</p>
+    <div class="rules">
+      <div class="rule"><i>👀</i><div>Your camera notices when you laugh, gasp or drift. <b>No video of you is saved.</b> Just numbers.</div></div>
+      <div class="rule"><i>🔒</i><div>Your name is watermarked on the film. Please don't record or share it.</div></div>
+      <div class="rule"><i>⏯️</i><div>No skipping. The film pauses if you leave this tab.</div></div>
+    </div>
+    <label class="agree"><input type="checkbox" id="agree"><span>I'll keep this film confidential and I'm OK with my reactions being measured.</span></label>
+    <div class="stack"><button class="btn block" id="toCam" disabled>i'm in</button></div>
+  </div>
+</section>
+
+<!-- ================= VIEWER: profile ================= -->
+<section class="vscreen" id="v-profile" hidden>
+  <div class="vinner">
+    <h2>quick vibe<br>check</h2>
+    <p>Four taps. It helps the studio see who the film works for. Nothing here is shared with your name.</p>
+    <div class="qg" id="nameWrap"><b>first name</b><input class="inp" id="vName" maxlength="24" autocomplete="given-name" placeholder="so we know who to pay"></div>
+    <div id="profQs"></div>
+    <div class="stack"><button class="btn block" id="profNext">next</button></div>
+    <button class="linkbtn" id="profSkip">skip this</button>
+  </div>
+</section>
+
+<!-- ================= VIEWER: survey ================= -->
+<section class="vscreen" id="v-survey" hidden>
+  <div class="vinner">
+    <div class="steps" id="svSteps"></div>
+    <h2 id="svTitle"></h2>
+    <p id="svSub"></p>
+    <div id="svBody"></div>
+    <div class="stack" id="svNextWrap" hidden><button class="btn block" id="svNext">next</button></div>
+    <button class="linkbtn" id="svSkip">skip</button>
+  </div>
+</section>
+
+<!-- ================= VIEWER: camera check ================= -->
+<section class="vscreen" id="v-cam" hidden>
+  <div class="vinner">
+    <h2>say hi to<br>your camera</h2>
+    <p>Just checking we can see you. This preview isn't recorded.</p>
+    <div class="camframe" id="camframe"><canvas id="camCanvas" width="300" height="400"></canvas></div>
+    <div class="chip" id="chip"><span class="dot"></span><span id="chipText">starting camera…</span></div>
+    <p style="font-size:14px">Face the screen, and keep a little light on in the room.</p>
+    <div class="stack"><button class="btn block" id="toWatch" disabled>start the film</button></div>
+    <div class="err" id="camErr" hidden></div>
+  </div>
+</section>
+
+<!-- ================= VIEWER: link problems ================= -->
+<section class="vscreen" id="v-bad" hidden>
+  <div class="vinner">
+    <h2 id="badTitle">this link isn't working</h2>
+    <p id="badText"></p>
+  </div>
+</section>
+
+<!-- ================= VIEWER: stage ================= -->
+<div class="stage" id="v-watch" hidden>
+  <video id="film" playsinline disablepictureinpicture controlslist="nodownload noplaybackrate noremoteplayback" preload="auto"></video>
+  <div class="wm-tile" id="wmTile"></div>
+  <div class="wm" id="wm"></div>
+  <div class="facewarn" id="faceWarn" hidden>can't see you. still rolling.</div>
+  <div class="ctrls" id="ctrls">
+    <div class="bar" aria-hidden="true"><i id="barFill"></i></div>
+    <div class="line">
+      <button class="cbtn" id="pp">Pause</button>
+      <span id="ftime">0:00 / 0:00</span>
+      <span class="sp"></span>
+      <span class="rec">reactions on</span>
+      <button class="cbtn" id="fs">Fullscreen</button>
+      <button class="cbtn warnb" id="endEarly">End early</button>
+    </div>
+  </div>
+  <div class="overlay" id="ovStart"><div class="box">
+    <h3 id="ovStartTitle">ready when you are</h3>
+    <p>Sound on, phone down. The film plays straight through.</p>
+    <button class="btn" id="startFilm">▶&nbsp; play the film</button>
+  </div></div>
+  <div class="overlay" id="ovAway" hidden><div class="box">
+    <h3>paused while you were away</h3>
+    <p>The film stops when you leave this tab, to keep it private.</p>
+    <button class="btn" id="resume">▶&nbsp; keep watching</button>
+  </div></div>
+  <div class="overlay" id="ovErr" hidden><div class="box">
+    <h3>the film won't load</h3>
+    <p id="ovErrText">Check your connection and reload this page.</p>
+  </div></div>
+</div>
+
+<!-- ================= VIEWER: recap ================= -->
+<section class="vscreen" id="v-recap" hidden>
+  <div class="vinner">
+    <div class="earn" id="rcEarn" hidden></div>
+    <h2 id="rcH">that's a wrap 🎬</h2>
+    <p id="recapLead">Thanks for watching. Here's how you watched.</p>
+    <div class="recap">
+      <div class="eb" id="rcWho">your screening recap</div>
+      <div class="big"><span id="rcPct">0</span><small>%</small></div>
+      <div class="sub">of the film with your eyes on the screen</div>
+      <div class="emo-row" id="rcEmo"></div>
+    </div>
+    <div class="stack">
+      <button class="btn block" id="rcStudio" hidden>see it in the studio view</button>
+      <button class="btn block lav" id="rcDownload">download my reactions</button>
+    </div>
+    <p style="font-size:14px; margin-top:14px" id="rcNote"></p>
+  </div>
+</section>
+
+<!-- ================= RESULTS ================= -->
+<div class="rs" id="v-results" hidden>
+  <div class="rs-top">
+    <button class="btn sm ghost" id="rsBack">← Studio</button>
+    <div class="t"><b id="rsTitle"></b><span id="rsMeta"></span></div>
+    <div class="acts">
+      <span class="file-link btn sm ghost">Add reaction files<input type="file" id="rsImport" accept=".json,application/json" multiple></span>
+      <button class="btn sm" id="rsExport">Export markers</button>
+    </div>
+  </div>
+  <div class="segbar" id="segbar" role="group" aria-label="Audience group"></div>
+  <div class="rs-stats" id="rsStats"></div>
+  <div class="rs-mid">
+    <div class="pv" id="pv">
+      <video id="pvVideo" playsinline preload="auto" hidden></video>
+      <canvas id="pvCanvas" width="960" height="540"></canvas>
+      <div class="tc" id="pvTc">0:00</div>
+      <div class="now" id="pvNow"></div>
+    </div>
+    <div class="moments">
+      <header><b>Key moments</b></header>
+      <div class="filters" id="filters" role="group" aria-label="Filter moments"></div>
+      <div class="mlist" id="mlist"></div>
+    </div>
+  </div>
+  <div class="transport">
+    <button class="play" id="rsPlay" aria-label="Play">▶</button>
+    <div class="time" id="rsTime">0:00 <span>/ 0:00</span></div>
+    <span class="sp"></span>
+    <span class="prog" id="thumbProg"></span>
+    <div class="zoom"><span aria-hidden="true">−</span><input type="range" id="zoom" min="0" max="100" value="0" aria-label="Timeline zoom"><span aria-hidden="true">+</span></div>
+  </div>
+  <div class="tl" id="tl">
+    <div class="tl-labels" id="tlLabels"></div>
+    <div class="tl-main" id="tlMain">
+      <canvas id="tlCanvas"></canvas>
+      <div class="tl-scroll" id="tlScroll" tabindex="0" aria-label="Timeline. Left and right arrows move 5 seconds."><div class="tl-inner" id="tlInner"><div class="ph" id="ph"></div></div></div>
+    </div>
+  </div>
+  <div class="rhead"><h2>The report</h2><span id="rhSub"></span></div>
+  <div class="report" id="report"></div>
+</div>
+
+<script type="module">
+/* ============================================================
+   helpers
+   ============================================================ */
+const $ = id => document.getElementById(id);
+const clamp = (v,a,b) => v<a?a:v>b?b:v;
+const mean = a => { let s=0; for (const x of a) s+=x; return a.length ? s/a.length : 0; };
+const median = a => { if (!a.length) return 0; const s=[...a].sort((x,y)=>x-y); return s[s.length>>1]; };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = s => { s=Math.max(0,Math.floor(s)); const h=Math.floor(s/3600), m=Math.floor(s%3600/60), x=s%60;
+  return h ? `${h}:${String(m).padStart(2,"0")}:${String(x).padStart(2,"0")}` : `${m}:${String(x).padStart(2,"0")}`; };
+function rng(a){ return () => { a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+const b64 = s => btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+const unb64 = s => decodeURIComponent(escape(atob(s.replace(/-/g,"+").replace(/_/g,"/"))));
+const safe = s => String(s).replace(/[^A-Za-z0-9._-]+/g,"_").replace(/^_+|_+$/g,"") || "x";
+const once = (el, ev, ms=15000) => new Promise((res, rej) => {
+  const t = setTimeout(() => { cleanup(); rej(new Error("timeout")); }, ms);
+  const ok = () => { cleanup(); res(); }, bad = () => { cleanup(); rej(new Error("error")); };
+  function cleanup(){ clearTimeout(t); el.removeEventListener(ev, ok); el.removeEventListener("error", bad); }
+  el.addEventListener(ev, ok); el.addEventListener("error", bad);
+});
+function toast(msg){ const d=document.createElement("div"); d.className="toast"; d.textContent=msg; document.body.appendChild(d); setTimeout(()=>d.remove(), 2200); }
+function download(name, text, type="application/json"){
+  const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(new Blob([text], {type})), download: name });
+  document.body.appendChild(a); a.click(); a.remove();
+}
+const params = new URLSearchParams(location.search);
+const MOCK = params.get("demo") === "1";
+const VIEWS = ["v-home","v-studio","v-invite","v-profile","v-cam","v-bad","v-watch","v-survey","v-recap","v-results"];
+function show(id){ VIEWS.forEach(v => $(v).hidden = v !== id); window.scrollTo(0,0); }
+
+const EMO = {
+  fire:     { icon:"🔥", name:"Most engaged", color:"#FF4D2E" },
+  laugh:    { icon:"😂", name:"Laughs",   color:"#FFC857", verb:"laughed" },
+  surprise: { icon:"😮", name:"Gasps",    color:"#5FD3F3", verb:"gasped" },
+  tension:  { icon:"😬", name:"Tension",  color:"#FF7A45", verb:"tensed up" },
+  confused: { icon:"🤔", name:"Confused", color:"#C9B8FF", verb:"looked confused" },
+  cringe:   { icon:"😖", name:"Cringe",   color:"#8BE39B", verb:"cringed" },
+  drift:    { icon:"📱", name:"Lost them",color:"#FF5C7A" },
+  remember: { icon:"⭐", name:"Remembered", color:"#FFD84D" },
+};
+const PROF = [
+  { k:"age", t:"your age", opts:[["18-24","18–24"],["25-34","25–34"],["35-44","35–44"],["45+","45+"]] },
+  { k:"gender", t:"you are", opts:[["woman","a woman"],["man","a man"],["nb","nonbinary"],["skip","rather not say"]] },
+  { k:"freq", t:"you watch movies like this…", opts:[["all","all the time"],["some","sometimes"],["rare","rarely"]] },
+  { k:"trailer", t:"seen the trailer?", opts:[["yes","yep"],["no","nope"]] },
+];
+const SURVEY = {
+  recommend: { title:"would you tell a friend to watch it?", opts:[["definitely","😍","definitely"],["probably","🙂","probably"],["maybe","😐","eh, maybe"],["no","🙅","nah"]],
+    colors:{definitely:"#8BE39B",probably:"#C9B8FF",maybe:"#6F6877",no:"#FF5C7A"}, label:{definitely:"Definitely",probably:"Probably",maybe:"Maybe",no:"No"} },
+  watch: { title:"if it came out tomorrow, you'd…", opts:[["theater","🍿","see it in theaters"],["stream","🛋️","wait for streaming"],["skip","⏭️","skip it"]],
+    colors:{theater:"#FF7A45",stream:"#C9B8FF",skip:"#6F6877"}, label:{theater:"Theaters",stream:"Streaming",skip:"Skip"} },
+  ending: { title:"that ending…", opts:[["loved","🤯","loved it"],["worked","👍","worked for me"],["confused","🤔","confused me"],["letdown","😤","let me down"]],
+    colors:{loved:"#FFC857",worked:"#8BE39B",confused:"#C9B8FF",letdown:"#FF5C7A"}, label:{loved:"Loved it",worked:"Worked",confused:"Confused",letdown:"Let down"} },
+};
+const SEGS = [
+  { id:"all", label:"Everyone", f:() => true },
+  { id:"a1", label:"18–24", f:s => s.profile?.age === "18-24" },
+  { id:"a2", label:"25–34", f:s => s.profile?.age === "25-34" },
+  { id:"a3", label:"35+", f:s => s.profile?.age === "35-44" || s.profile?.age === "45+" },
+  { id:"w", label:"Women", f:s => s.profile?.gender === "woman" },
+  { id:"m", label:"Men", f:s => s.profile?.gender === "man" },
+  { id:"fan", label:"Big fans", f:s => s.profile?.freq === "all" },
+  { id:"cas", label:"Casual", f:s => s.profile?.freq === "some" || s.profile?.freq === "rare" },
+  { id:"tr", label:"Saw trailer", f:s => s.profile?.trailer === "yes" },
+  { id:"ntr", label:"No trailer", f:s => s.profile?.trailer === "no" },
+];
+const LANES = ["laugh","surprise","tension","confused","cringe"];
+const AV_COLORS = ["#FF7A45","#C9B8FF","#FFC857","#8BE39B","#5FD3F3","#FF9EC4"];
+
+/* ============================================================
+   procedural frames (sample film + placeholder posters)
+   ============================================================ */
+const SCENES = [
+  [0,"Cold open",["#1d2b53","#7e2553","#ffa300"]],[95,"The lease",["#2b2d42","#8d99ae","#ef233c"]],
+  [250,"Basement",["#0b090a","#2b1d1f","#a4161a"]],[410,"Rent day",["#03045e","#0077b6","#90e0ef"]],
+  [590,"The landlord's son",["#3d405b","#81b29a","#f2cc8f"]],[770,"Karaoke night",["#240046","#7b2cbf","#ff6d00"]],
+  [930,"Hospital",["#6c7a89","#c9d6df","#ffe5d9"]],[1075,"Blackout",["#000000","#14213d","#fca311"]],
+  [1190,"Final standoff",["#370617","#9d0208","#ffba08"]],[1295,"Credits",["#000000","#0d0d0d","#ffffff"]]
+];
+const DEMO_SCENE_INFO = [
+  ["comedy","Maya's first night in the new apartment ends with the radiator screaming at 3am."],
+  ["comedy","She signs a lease full of absurd rules while the landlord reads each one aloud."],
+  ["tension","Strange noises lead her down to the basement, where the lights won't stay on."],
+  ["comedy","Rent day: the whole building hides from the landlord's knock."],
+  ["quiet","The landlord's son explains the building's history in one long conversation."],
+  ["comedy","Tenants' karaoke night; the landlord sings a ballad nobody asked for."],
+  ["emotional","The landlord collapses and Maya waits with him at the hospital."],
+  ["tension","A citywide blackout; something moves in the dark hallway."],
+  ["tension","Maya confronts the landlord's son in the basement."],
+  ["credits","End credits."]
+];
+function demoScenes(D){ return SCENES.map((x,i) => ({ start:x[0], end: SCENES[i+1] ? SCENES[i+1][0] : D, title:x[1], caption:DEMO_SCENE_INFO[i][1], tone:DEMO_SCENE_INFO[i][0], dialogue:"" })); }
+const sceneAt = t => { let s=SCENES[0]; for (const x of SCENES) if (t>=x[0]) s=x; return s; };
+function drawFrame(ctx, w, h, t, palette){
+  const sc = palette ? [0,"",palette] : sceneAt(t), idx = palette ? 3 : SCENES.indexOf(sc), [c1,c2,c3] = sc[2], local = t - sc[0];
+  const g = ctx.createLinearGradient(0,0,0,h); g.addColorStop(0,c1); g.addColorStop(1,c2);
+  ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+  if (!palette && sc[1]==="Credits"){
+    ctx.fillStyle="#fff"; ctx.textAlign="center"; ctx.font=`700 ${Math.round(h*.09)}px system-ui,sans-serif`; ctx.fillText("LANDLORD", w/2, h*.45);
+    ctx.font=`400 ${Math.round(h*.045)}px system-ui,sans-serif`; ctx.globalAlpha=.6; ctx.fillText("a film by somebody new", w/2, h*.58); ctx.globalAlpha=1; return;
+  }
+  ctx.globalAlpha=.85; ctx.fillStyle=c3; ctx.beginPath(); ctx.arc(w*(.2+.6*((idx*37)%10)/10)+local*.3, h*.36, h*.13, 0, 7); ctx.fill(); ctx.globalAlpha=1;
+  const R = rng(idx*977+3); ctx.fillStyle="rgba(0,0,0,.5)"; let x = -((local*1.4) % (w*.4));
+  while (x < w){ const bw=w*(.05+R()*.1), bh=h*(.12+R()*.38); ctx.fillRect(x, h*.78-bh, bw-3, bh); x += bw; }
+  ctx.fillStyle="rgba(0,0,0,.72)"; ctx.fillRect(0,h*.78,w,h*.22);
+  const fx = w*(.4+.22*Math.sin(local/23+idx)); ctx.fillStyle="rgba(8,6,10,.92)";
+  ctx.beginPath(); ctx.arc(fx, h*.56, h*.05, 0, 7); ctx.fill(); ctx.fillRect(fx-h*.055, h*.62, h*.11, h*.17);
+  const vg = ctx.createRadialGradient(w/2,h/2,h*.2,w/2,h/2,w*.7); vg.addColorStop(0,"rgba(0,0,0,0)"); vg.addColorStop(1,"rgba(0,0,0,.6)");
+  ctx.fillStyle=vg; ctx.fillRect(0,0,w,h);
+}
+function drawPlaceholder(ctx, w, h, t){
+  const hue = (t*0.7) % 360; const g = ctx.createLinearGradient(0,0,w,h);
+  g.addColorStop(0, `hsl(${hue},35%,22%)`); g.addColorStop(1, `hsl(${(hue+50)%360},35%,12%)`);
+  ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+  ctx.fillStyle="rgba(255,255,255,.5)"; ctx.textAlign="center"; ctx.font=`700 ${Math.round(h*.16)}px system-ui,sans-serif`; ctx.fillText(fmt(t), w/2, h*.58);
+}
+function drawCover(ctx, src, w, h){
+  const sw = src.videoWidth || src.width, sh = src.videoHeight || src.height; if (!sw || !sh) return;
+  const s = Math.max(w/sw, h/sh), dw = sw*s, dh = sh*s; ctx.drawImage(src, (w-dw)/2, (h-dh)/2, dw, dh);
+}
+
+/* ============================================================
+   face model + camera (shared by viewer)
+   ============================================================ */
+const MP_VER = "0.10.21";
+const MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
+let landmarker = null, camStream = null;
+const camVideo = $("camVideo");
+async function loadModel(){
+  if (MOCK || landmarker) return;
+  const { FaceLandmarker, FilesetResolver } = await import(`https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MP_VER}/vision_bundle.mjs`);
+  const files = await FilesetResolver.forVisionTasks(`https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MP_VER}/wasm`);
+  const opts = d => ({ baseOptions:{ modelAssetPath:MODEL, delegate:d }, runningMode:"VIDEO", numFaces:1, outputFaceBlendshapes:true, outputFacialTransformationMatrixes:true });
+  try { landmarker = await FaceLandmarker.createFromOptions(files, opts("GPU")); }
+  catch { landmarker = await FaceLandmarker.createFromOptions(files, opts("CPU")); }
+}
+async function openCamera(){
+  if (MOCK || camStream) return;
+  camStream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:"user", width:{ideal:640}, height:{ideal:480}, frameRate:{ideal:15} }, audio:false });
+  camVideo.srcObject = camStream; await camVideo.play();
+}
+function closeCamera(){ camStream?.getTracks().forEach(t => t.stop()); camStream = null; camVideo.srcObject = null; }
+function headAngles(m){
+  const r = (row,col) => m.data[col*4+row];
+  return [ Math.atan2(-r(2,0), Math.hypot(r(0,0), r(1,0)))*180/Math.PI, Math.atan2(r(2,1), r(2,2))*180/Math.PI ];
+}
+let mockT = 0; const mockR = rng(7);
+let lastTs = 0;
+function readFrame(){
+  if (MOCK){
+    mockT += 1/12; const t = mockT, away = Math.sin(t/9) > .97, R = mockR;
+    return { found: (t % 200) < 192, yaw: away?40:Math.sin(t/3)*4, pitch: Math.sin(t/5)*3, down: away?.8:.1,
+      smile: (t%47<3)?.8:.04+R()*.03, jaw: (t%47<3)?.4:.05, browUp: (t%61<1.5)?.7:.08, browDown: (t%73<2)?.55:.06,
+      press: (t%89<6)?.5:.05, sneer: (t%97<1.5)?.45:.03, blink: R()<.025, nose:[.5+Math.sin(t)*.003+((t%83<.4)?.08:0),.5], width:.25 };
+  }
+  if (!landmarker || camVideo.readyState < 2) return null;
+  let ts = performance.now(); if (ts <= lastTs) ts = lastTs + 1; lastTs = ts;
+  const res = landmarker.detectForVideo(camVideo, ts);
+  if (!res.faceLandmarks?.length) return { found:false };
+  const lm = res.faceLandmarks[0], b = {};
+  for (const c of res.faceBlendshapes[0].categories) b[c.categoryName] = c.score;
+  const [yaw, pitch] = headAngles(res.facialTransformationMatrixes[0]);
+  return { found:true, yaw, pitch,
+    down:(b.eyeLookDownLeft+b.eyeLookDownRight)/2, smile:(b.mouthSmileLeft+b.mouthSmileRight)/2, jaw:b.jawOpen,
+    browUp:(b.browInnerUp+(b.browOuterUpLeft+b.browOuterUpRight)/2)/2, browDown:(b.browDownLeft+b.browDownRight)/2,
+    press:(b.mouthPressLeft+b.mouthPressRight)/2, sneer:(b.noseSneerLeft+b.noseSneerRight)/2,
+    blink:(b.eyeBlinkLeft+b.eyeBlinkRight)/2 > .5,
+    nose:[lm[1].x, lm[1].y], width: Math.hypot(lm[234].x-lm[454].x, lm[234].y-lm[454].y) || 1e-6 };
+}
+
+/* ============================================================
+   analysis (shared by recap + results)
+   ============================================================ */
+const CH = ["smile","jaw","brow_up","brow_down","press","sneer"];
+function prep(s, D){
+  const g = k => { const a = Array.isArray(s[k]) ? s[k] : [], o = new Float32Array(D); for (let i=0;i<D;i++){ const v=+a[i]; o[i]=isFinite(v)?v:0; } return o; };
+  const v = { id:String(s.viewer_id||"viewer"), name:String(s.name||s.viewer_id||"viewer"), face:g("face"), attention:g("attention"), motion:g("motion"), blink:g("blink"), has:{}, z:{} };
+  v.hasBlink = Array.isArray(s.blink);
+  const seen = []; for (let i=0;i<D;i++) if (v.face[i]) seen.push(i);
+  v.last = seen.length ? seen[seen.length-1] : -1;
+  for (const c of CH){
+    v[c] = g(c); v.has[c] = Array.isArray(s[c]);
+    const vals = seen.map(i => v[c][i]), m = median(vals), mad = median(vals.map(x => Math.abs(x-m)))*1.4826, sd = Math.max(mad, .03);
+    const z = new Float32Array(D); for (const i of seen) z[i] = (v[c][i]-m)/sd; v.z[c] = z;
+  }
+  v.mMed = median(seen.map(i => v.motion[i]));
+  const att = seen.filter(i => v.attention[i]); v.blinkRate = att.length ? mean(att.map(i => v.blink[i])) : 0;
+  return v;
+}
+function viewerEvents(v, D){
+  const E = {}; LANES.forEach(k => E[k] = new Uint8Array(D));
+  for (let t=0;t<D;t++){
+    if (!v.face[t]) continue;
+    const z = c => v.z[c][t];
+    if (v.has.smile && v.smile[t] > .45 && z("smile") > 3) E.laugh[t] = 1;
+    if (v.has.brow_up && v.brow_up[t] > .35 && z("brow_up") > 3 && (!v.has.jaw || z("jaw") > 1.5)) E.surprise[t] = 1;
+    if (v.has.press && v.press[t] > .25 && z("press") > 2.5 && v.attention[t] && v.motion[t] <= v.mMed*1.3) E.tension[t] = 1;
+    if (v.has.brow_down && v.brow_down[t] > .3 && z("brow_down") > 3 && v.attention[t]) E.confused[t] = 1;
+    if (v.has.sneer && v.sneer[t] > .25 && z("sneer") > 3) E.cringe[t] = 1;
+  }
+  return E;
+}
+const onsets = (arr, gap=0) => { let n=0, last=-1e9; for (let i=0;i<arr.length;i++){ if (arr[i]){ if (i-last > gap+1) n++; last=i; } } return n; };
+function localPeaks(arr, spacing, minVal, top){
+  const c = [];
+  for (let i=0;i<arr.length;i++){ const v=arr[i]; if (v==null || v<minVal) continue;
+    if ((i===0 || v>=(arr[i-1]??-1)) && (i===arr.length-1 || v>=(arr[i+1]??-1))) c.push(i); }
+  c.sort((a,b) => arr[b]-arr[a]); const out = [];
+  for (const i of c){ if (out.every(j => Math.abs(j-i) >= spacing)) out.push(i); if (out.length >= top) break; }
+  return out;
+}
+function smooth(arr, w){
+  const o = new Float32Array(arr.length), h = w>>1;
+  for (let i=0;i<arr.length;i++){ let s=0,n=0; for (let k=i-h;k<=i+h;k++) if (k>=0 && k<arr.length && arr[k]!=null){ s+=arr[k]; n++; } o[i] = n ? s/n : 0; }
+  return o;
+}
+function analyse(sessions, D){
+  const V = sessions.map(s => prep(s, D)), N = V.length, ev = V.map(v => viewerEvents(v, D));
+  const inRoom = new Uint16Array(D), watching = new Uint16Array(D);
+  V.forEach(v => { for (let t=0;t<D;t++){ if (t <= v.last) inRoom[t]++; if (v.attention[t]) watching[t]++; } });
+  const attn = Array.from(inRoom, (r,t) => r ? watching[t]/r : 0);
+  const share = {}, count = {};
+  for (const k of LANES){
+    share[k] = new Float32Array(D); count[k] = new Uint16Array(D);
+    for (let t=0;t<D;t++){
+      let c = 0; for (let i=0;i<N;i++){ const e=ev[i][k]; if (e[t] || e[t+1] || e[t+2] || (t>0 && e[t-1])) c++; }
+      count[k][t] = c; share[k][t] = inRoom[t] ? c/inRoom[t] : 0;
+    }
+  }
+  const imm = new Float32Array(D);
+  for (let t=0;t<D;t++){
+    let s=0, n=0;
+    V.forEach(v => { if (!v.hasBlink || !v.attention[t] || !v.blinkRate) return; let b=0,w=0; for (let k=t-5;k<=t+5;k++) if (k>=0&&k<D&&v.face[k]){ b+=v.blink[k]; w++; }
+      if (w){ s += clamp(1 - (b/w)/v.blinkRate/2, 0, 1); n++; } });
+    imm[t] = n ? s/n : .5;
+  }
+  const eng = new Float32Array(D);
+  for (let t=0;t<D;t++){ let r=0; for (const k of LANES) r = Math.max(r, share[k][t]); eng[t] = 100*(.6*attn[t] + .2*imm[t] + .2*Math.min(1, r*2.5)); }
+  const engS = smooth(eng, 9), avg = mean(Array.from(engS).filter((_,t) => inRoom[t]));
+  const minShare = Math.max(.2, 2/Math.max(N,1));
+  const peaks = { fire: localPeaks(engS.map((v,t) => t < 8 ? 0 : v), Math.min(60, Math.max(15, D/8)), avg+3, 3) };
+  for (const k of LANES) peaks[k] = localPeaks(share[k], 20, minShare, 12);
+  // lost stretches
+  const drift = []; let cur = null;
+  for (let t=0;t<D;t++){
+    const low = inRoom[t] && engS[t] < avg-10;
+    if (low){ if (cur && t-cur.e <= 10) cur.e = t; else { if (cur) drift.push(cur); cur = {s:t, e:t}; } }
+  }
+  if (cur) drift.push(cur);
+  const lost = drift.filter(d => d.e-d.s >= 40).map(d => { let m=100; for (let t=d.s;t<=d.e;t++) m=Math.min(m,engS[t]); return {...d, min:m, sev:(avg-m)*(d.e-d.s)}; })
+    .sort((a,b) => b.sev-a.sev).slice(0,3).sort((a,b) => a.s-b.s);
+  const walkouts = V.filter(v => v.last >= 0 && v.last < D-60).map(v => ({ t:v.last, name:v.name })).sort((a,b) => a.t-b.t);
+  const totals = {}; for (const k of LANES) totals[k] = ev.reduce((s,e) => s+onsets(e[k], k==="tension"||k==="confused" ? 12 : 2), 0);
+  return { N, D, V, ev, inRoom, attn, share, count, eng:engS, avg, peaks, lost, walkouts, totals };
+}
+
+/* ============================================================
+   STUDIO
+   ============================================================ */
+const S = { film:null, people:[], invites:[], sessions:[] };
+function setFilm(f){
+  $("filmErr").textContent = "";
+  const probe = document.createElement("video"); probe.preload = "metadata"; probe.muted = true; probe.src = f.src;
+  $("filmName").textContent = f.name; $("filmMeta").textContent = "reading video…"; $("filmPill").hidden = false;
+  once(probe, "loadedmetadata").then(() => {
+    if (!isFinite(probe.duration) || probe.duration < 5) throw new Error("short");
+    S.film = { ...f, duration: Math.floor(probe.duration) };
+    $("filmMeta").textContent = `${fmt(S.film.duration)} · ${f.kind === "url" ? "hosted link, works on any device" : "on this device only"}` + (f.credit ? ` · ${f.credit}` : "");
+    if (!$("title").value) $("title").value = f.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ");
+  }).catch(() => {
+    S.film = null; $("filmPill").hidden = true;
+    $("filmErr").textContent = "That video couldn't be read. Try an .mp4 (H.264) or .webm file, or check the link opens in a browser.";
+  });
+}
+$("filmFile").addEventListener("change", e => { const f = e.target.files[0]; if (f) setFilm({ kind:"file", src:URL.createObjectURL(f), name:f.name }); });
+const drop = $("drop");
+["dragenter","dragover"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave","drop"].forEach(ev => drop.addEventListener(ev, () => drop.classList.remove("over")));
+drop.addEventListener("drop", e => { e.preventDefault(); const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith("video")) setFilm({ kind:"file", src:URL.createObjectURL(f), name:f.name }); else $("filmErr").textContent = "Drop a video file."; });
+$("useUrl").onclick = () => { const u = $("filmUrl").value.trim();
+  if (!/^https?:\/\/\S+$/i.test(u)) { $("filmErr").textContent = "Paste a full link starting with https://"; return; }
+  setFilm({ kind:"url", src:u, name:decodeURIComponent(u.split("/").pop().split("?")[0] || "Hosted film") }); };
+const SAMPLE_URL = "https://archive.org/download/CaminandesLlamigos/Caminandes_%20Llamigos-1080p.mp4";
+$("useSample").onclick = () => {
+  $("filmUrl").value = SAMPLE_URL; $("title").value = "Caminandes 3: Llamigos";
+  if (!$("studioName").value) $("studioName").value = "Screentest demo";
+  setFilm({ kind:"url", src:SAMPLE_URL, name:"Caminandes 3: Llamigos", credit:"© Blender Foundation, CC BY 3.0" });
+};
+$("filmClear").onclick = () => { S.film = null; $("filmPill").hidden = true; $("filmFile").value = ""; };
+
+function renderPeople(){
+  $("people").innerHTML = S.people.map((p,i) => `<span class="person">${esc(p.name)} <em>${esc(p.email)}</em><button data-i="${i}" aria-label="Remove ${esc(p.name)}">×</button></span>`).join("");
+}
+function addPerson(){
+  const name = $("pName").value.trim(), email = $("pEmail").value.trim();
+  if (!name){ $("pErr").textContent = "Add a name so the watermark knows who's watching."; $("pName").focus(); return; }
+  if (email && !/^\S+@\S+\.\S+$/.test(email)){ $("pErr").textContent = "That email doesn't look right."; $("pEmail").focus(); return; }
+  $("pErr").textContent = ""; S.people.push({ name, email }); $("pName").value = ""; $("pEmail").value = ""; $("pName").focus(); renderPeople();
+}
+$("pAdd").onclick = addPerson;
+["pName","pEmail"].forEach(id => $(id).addEventListener("keydown", e => { if (e.key === "Enter") addPerson(); }));
+$("people").onclick = e => { const b = e.target.closest("button[data-i]"); if (b){ S.people.splice(+b.dataset.i, 1); renderPeople(); } };
+
+$("create").onclick = () => {
+  const err = $("createErr");
+  if (!S.film){ err.textContent = "Add your film first."; return; }
+  if (!$("title").value.trim()){ err.textContent = "Give the screening a title."; $("title").focus(); return; }
+  if (!S.people.length){ err.textContent = "Invite at least one person."; $("pName").focus(); return; }
+  err.textContent = "";
+  const hours = +$("optExp").value, o = { wm:$("optWm").checked, leave:$("optLeave").checked, cam:$("optCam").checked };
+  S.film.title = $("title").value.trim(); S.film.studio = $("studioName").value.trim() || "A studio";
+  for (const p of S.people){
+    const id = Math.random().toString(36).slice(2,8);
+    const data = { v:2, id, n:p.name, e:p.email, t:S.film.title, st:S.film.studio, s:S.film.kind==="url" ? S.film.src : "", d:S.film.duration, x:Date.now()+hours*3600e3, o };
+    S.invites.push({ ...p, id, data, link: location.href.split("#")[0] + "#i=" + b64(JSON.stringify(data)), done:false });
+  }
+  S.people = []; renderPeople(); renderInvites(); toast(`${S.invites.length} invite link${S.invites.length>1?"s":""} ready`);
+};
+function renderInvites(){
+  if (!S.invites.length) return;
+  $("invites").innerHTML = S.invites.map((v,i) => `<div class="inv">
+    <span class="av" style="background:${AV_COLORS[i%AV_COLORS.length]}">${esc(v.name[0].toUpperCase())}</span>
+    <div class="who"><b>${esc(v.name)}</b><span>${esc(v.email || "no email")} · ${esc(v.data.t)}</span></div>
+    <div class="acts">${v.done ? '<span class="status done">watched</span>' : '<span class="status">invited</span>'}
+      <button class="btn sm ghost" data-copy="${i}">Copy link</button>
+      ${v.done ? "" : `<button class="btn sm" data-open="${i}">Watch as ${esc(v.name.split(" ")[0])}</button>`}</div></div>`).join("");
+  const n = S.sessions.length;
+  $("openRes").disabled = !n;
+  $("resHint").textContent = n ? `${n} of ${S.invites.length} watched. Results update as more people finish.` : "Results unlock after the first person finishes watching.";
+}
+$("invites").onclick = async e => {
+  const c = e.target.closest("[data-copy]"), o = e.target.closest("[data-open]");
+  if (c){ const v = S.invites[+c.dataset.copy];
+    try { await navigator.clipboard.writeText(v.link); toast("Link copied"); } catch { prompt("Copy this link", v.link); }
+    if (S.film.kind === "file") toast("Heads up: this link only plays on this device until the film is hosted"); }
+  if (o){ const v = S.invites[+o.dataset.open]; W.earn = false; startViewer(v.data, S.film.src, v); }
+};
+async function readSessionFiles(files){
+  const out = [], bad = [];
+  for (const f of files){
+    try { const j = JSON.parse(await f.text()); const list = Array.isArray(j.viewers) ? j.viewers : [j];
+      for (const s of list){ if (!Array.isArray(s.face) || !Array.isArray(s.attention)) throw 0; out.push(s); } }
+    catch { bad.push(f.name); }
+  }
+  return { out, bad };
+}
+$("importFiles").onchange = async e => {
+  const { out, bad } = await readSessionFiles([...e.target.files]); e.target.value = "";
+  S.sessions.push(...out);
+  $("importMsg").textContent = (out.length ? `Added ${out.length} viewer${out.length>1?"s":""}. ` : "") + (bad.length ? `Couldn't read ${bad.join(", ")}.` : "");
+  $("openRes").disabled = !S.sessions.length;
+};
+$("openRes").onclick = () => openResults(false);
+$("openDemo").onclick = () => openResults(true);
+
+/* ============================================================
+   EARN HOME (viewer marketplace)
+   ============================================================ */
+const PAY = 2;
+const DEMO_FILM = { kind:"url", name:"Caminandes 3: Llamigos", title:"Caminandes 3: Llamigos", studio:"Blender Studio", credit:"© Blender Foundation, CC BY 3.0",
+  local:"caminandes.mp4", meta:"film.json", remote:"https://archive.org/download/CaminandesLlamigos/Caminandes_%20Llamigos-1080p.mp4" };
+const wallet = { get(){ try { return +localStorage.getItem("screentest.wallet") || 0; } catch { return 0; } },
+  add(v){ const n = this.get() + v; try { localStorage.setItem("screentest.wallet", String(n)); } catch {} return n; } };
+let walletMem = null;
+function balance(){ const b = wallet.get(); return walletMem != null ? Math.max(walletMem, b) : b; }
+function paintWallet(){ $("walletAmt").textContent = "$" + balance().toFixed(2); }
+let demoSrc = null;
+async function resolveDemoSrc(){
+  if (demoSrc) return demoSrc;
+  for (const u of [DEMO_FILM.local, DEMO_FILM.remote]){
+    const v = document.createElement("video"); v.preload = "metadata"; v.muted = true; v.src = u;
+    try { await once(v, "loadedmetadata", 8000); demoSrc = { src:u, duration:Math.floor(v.duration) }; return demoSrc; } catch {}
+  }
+  return null;
+}
+function showHome(){
+  paintWallet(); show("v-home"); $("featPay").textContent = "+$" + PAY.toFixed(2);
+  const img = new Image(); img.onload = () => $("featPic").style.backgroundImage = "url(poster.jpg)"; img.src = "poster.jpg";
+  if (!$("featPic").style.backgroundImage){ const c = document.createElement("canvas"); c.width = 640; c.height = 360; drawFrame(c.getContext("2d"), 640, 360, 0, ["#9fd3ff","#eef6ff","#ffffff"]); $("featPic").style.backgroundImage = `url(${c.toDataURL()})`; }
+}
+$("earnGo").onclick = async () => {
+  const b = $("earnGo"); b.disabled = true; b.textContent = "loading the screening…";
+  const r = await resolveDemoSrc(); b.disabled = false; b.textContent = `watch & earn $${PAY}`;
+  if (!r){ toast("Couldn't load the film. Put caminandes.mp4 next to this page."); return; }
+  S.film = { ...DEMO_FILM, src:r.src, duration:r.duration };
+  const inv = { v:2, id:Math.random().toString(36).slice(2,8), n:"viewer", e:"", t:DEMO_FILM.title, st:DEMO_FILM.studio, s:r.src, d:r.duration, x:0, o:{ wm:true, leave:true, cam:true } };
+  W.earn = true;
+  startViewer(inv, r.src, { done:false, data:inv, earn:true });
+  $("tFrom").textContent = `${DEMO_FILM.studio} · pays $${PAY.toFixed(2)}`;
+};
+$("toStudio").onclick = () => { history.replaceState(null, "", "#studio"); show("v-studio"); };
+$("toHome").onclick = () => { history.replaceState(null, "", location.pathname + location.search); showHome(); };
+
+/* ============================================================
+   VIEWER
+   ============================================================ */
+const W = { inv:null, src:"", invite:null, buckets:{}, away:0, raf:0, session:null };
+function startViewer(inv, src, invite=null){
+  W.inv = inv; W.src = src; W.invite = invite;
+  if (inv.x && Date.now() > inv.x){ $("badTitle").textContent = "this invite expired"; $("badText").textContent = `Ask ${inv.st} for a fresh link.`; show("v-bad"); return; }
+  if (!src){ $("badTitle").textContent = "open this on the studio's device";
+    $("badText").textContent = "This early version of Screentest needs the film hosted at a link before invites work on other devices."; show("v-bad"); return; }
+  $("tFrom").textContent = `${inv.st} invited you to a private screening`;
+  $("tTitle").textContent = inv.t; $("tName").textContent = inv.n;
+  $("tExp").textContent = inv.d ? `${Math.round(inv.d/60)} min` : "";
+  const pc = $("poster").getContext("2d"); drawFrame(pc, 640, 360, 0, ["#3A2647","#120E16","#FF7A45"]);
+  const pv = document.createElement("video"); pv.muted = true; pv.preload = "auto"; pv.src = src; pv.crossOrigin = /^https?:/.test(src) ? "anonymous" : null;
+  pv.addEventListener("loadeddata", () => { pv.currentTime = Math.min(pv.duration*.3, 120); }, { once:true });
+  pv.addEventListener("seeked", () => { try { drawCover(pc, pv, 640, 360); pc.getImageData(0,0,1,1); } catch { drawFrame(pc, 640, 360, 0, ["#3A2647","#120E16","#FF7A45"]); } }, { once:true });
+  $("agree").checked = false; $("toCam").disabled = true;
+  show("v-invite");
+}
+$("agree").onchange = e => $("toCam").disabled = !e.target.checked;
+
+let checkTimer = 0, previewRaf = 0;
+W.profile = {};
+function renderProfile(){
+  $("profQs").innerHTML = PROF.map(q => `<div class="qg"><b>${q.t}</b><div class="chips" data-k="${q.k}">${q.opts.map(([v,l]) => `<button aria-pressed="${W.profile[q.k]===v}" data-v="${v}">${l}</button>`).join("")}</div></div>`).join("");
+}
+$("profQs").onclick = e => { const b = e.target.closest("button[data-v]"); if (!b) return; const k = b.parentElement.dataset.k; W.profile[k] = W.profile[k] === b.dataset.v ? undefined : b.dataset.v; renderProfile(); };
+$("toCam").onclick = () => { W.profile = {}; renderProfile(); $("nameWrap").hidden = !W.earn; $("vName").value = ""; show("v-profile"); };
+$("profSkip").onclick = () => { W.profile = {}; goCamera(); };
+$("profNext").onclick = () => { const n = $("vName").value.trim(); if (!$("nameWrap").hidden && n){ W.inv.n = n; } goCamera(); };
+async function goCamera(){
+  if (W.inv.o && W.inv.o.cam === false){ beginWatch(); return; }
+  show("v-cam"); $("camErr").hidden = true; $("toWatch").disabled = true; setChip("bad","starting camera…");
+  try { await Promise.all([openCamera(), loadModel()]); }
+  catch (e) {
+    const denied = /NotAllowed|Permission/i.test(String(e));
+    $("camErr").hidden = false;
+    $("camErr").textContent = denied
+      ? "Camera's blocked. Tap the camera icon in the address bar (or your browser's site settings), allow it, then reload."
+      : "Couldn't start the camera or the face model. Make sure you're online and nothing else is using the camera, then reload.";
+    setChip("bad","camera unavailable"); return;
+  }
+  const cc = $("camCanvas").getContext("2d");
+  const draw = () => { previewRaf = requestAnimationFrame(draw);
+    if (MOCK){ cc.fillStyle = "#2F2338"; cc.fillRect(0,0,300,400); cc.font = "120px system-ui"; cc.textAlign = "center"; cc.fillText("🙂", 150, 240); return; }
+    cc.save(); cc.translate(300,0); cc.scale(-1,1); drawCover(cc, camVideo, 300, 400); cc.restore(); };
+  draw();
+  let seen = 0;
+  clearInterval(checkTimer);
+  checkTimer = setInterval(() => {
+    const f = readFrame();
+    if (f?.found){ seen++; setChip("ok","we see you ✓"); $("camframe").className = "camframe ok"; }
+    else { seen = 0; setChip("bad","move into frame, add some light"); $("camframe").className = "camframe bad"; }
+    $("toWatch").disabled = seen < 3;
+  }, 400);
+};
+function setChip(state, text){ $("chip").className = "chip " + state; $("chipText").textContent = text; }
+$("toWatch").onclick = () => { clearInterval(checkTimer); cancelAnimationFrame(previewRaf); beginWatch(); };
+
+const film = $("film");
+let wmTimer = 0, hideTimer = 0, endArm = 0;
+function beginWatch(){
+  show("v-watch");
+  W.buckets = {}; W.away = 0; W.prevNose = null; W.prevBlink = false; W.lostSince = null;
+  film.src = W.src; film.load();
+  $("ovStart").hidden = false; $("ovAway").hidden = true; $("ovErr").hidden = true; $("faceWarn").hidden = true;
+  $("ovStartTitle").textContent = `ready, ${W.inv.n.split(" ")[0].toLowerCase()}?`;
+  const wmOn = !W.inv.o || W.inv.o.wm !== false;
+  const label = [W.inv.n, W.inv.e, "#"+W.inv.id].filter(Boolean).join(" · ");
+  $("wm").hidden = !wmOn; $("wmTile").hidden = !wmOn; $("wm").textContent = label;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="360" height="200"><text x="20" y="110" fill="white" font-family="sans-serif" font-size="16" font-weight="700" transform="rotate(-18 180 100)">${esc(label)}</text></svg>`;
+  $("wmTile").style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+  const moveWm = () => { $("wm").style.top = (10 + Math.random()*75) + "%"; $("wm").style.left = (5 + Math.random()*55) + "%"; };
+  moveWm(); clearInterval(wmTimer); wmTimer = setInterval(moveWm, 12000);
+  cancelAnimationFrame(W.raf); W.raf = requestAnimationFrame(sampleLoop);
+}
+film.addEventListener("error", () => { if ($("v-watch").hidden) return; $("ovErr").hidden = false; $("ovStart").hidden = true; });
+film.addEventListener("contextmenu", e => e.preventDefault());
+$("v-watch").addEventListener("contextmenu", e => e.preventDefault());
+film.addEventListener("seeking", () => { if (W.maxT != null && film.currentTime > W.maxT + 1) film.currentTime = W.maxT; });
+film.addEventListener("timeupdate", () => {
+  W.maxT = Math.max(W.maxT || 0, film.currentTime);
+  const d = film.duration || 0; $("barFill").style.width = d ? (film.currentTime/d*100) + "%" : "0";
+  $("ftime").textContent = `${fmt(film.currentTime)} / ${fmt(d)}`;
+});
+film.addEventListener("play", () => { $("pp").textContent = "Pause"; poke(); });
+film.addEventListener("pause", () => { $("pp").textContent = "Play"; $("ctrls").classList.remove("hide"); });
+film.addEventListener("ended", finishViewer);
+$("startFilm").onclick = async () => { W.maxT = 0; try { await film.play(); $("ovStart").hidden = true; } catch { $("ovErr").hidden = false; $("ovErrText").textContent = "This browser couldn't play the film. Try Chrome or Safari."; } };
+$("pp").onclick = () => film.paused ? film.play() : film.pause();
+$("resume").onclick = () => { $("ovAway").hidden = true; film.play(); };
+$("fs").onclick = () => { const el = $("v-watch"); if (document.fullscreenElement) document.exitFullscreen(); else (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el); };
+$("endEarly").onclick = () => {
+  if (endArm){ clearTimeout(endArm); endArm = 0; finishViewer(); return; }
+  $("endEarly").textContent = "Tap again to end"; endArm = setTimeout(() => { endArm = 0; $("endEarly").textContent = "End early"; }, 3000);
+};
+function poke(){ $("ctrls").classList.remove("hide"); clearTimeout(hideTimer); hideTimer = setTimeout(() => { if (!film.paused) $("ctrls").classList.add("hide"); }, 2600); }
+["mousemove","touchstart","keydown"].forEach(ev => $("v-watch").addEventListener(ev, poke, { passive:true }));
+function leftTab(){
+  if ($("v-watch").hidden || film.paused || !$("ovStart").hidden) return;
+  if (W.inv.o && W.inv.o.leave === false) return;
+  film.pause(); W.away++; $("ovAway").hidden = false;
+}
+document.addEventListener("visibilitychange", () => { if (document.hidden) leftTab(); });
+window.addEventListener("blur", leftTab);
+
+function sampleLoop(now){
+  W.raf = requestAnimationFrame(sampleLoop);
+  if (film.paused || film.ended || now - (W.lastS || 0) < 80) return;
+  W.lastS = now;
+  const sec = Math.floor(film.currentTime);
+  const b = W.buckets[sec] ||= { frames:0, found:0, yaw:[], pitch:[], down:[], smile:0, jaw:0, browUp:0, browDown:0, press:0, sneer:0, motion:0, blinks:0 };
+  b.frames++;
+  const f = readFrame();
+  if (f?.found){
+    b.found++; b.yaw.push(f.yaw); b.pitch.push(f.pitch); b.down.push(f.down);
+    for (const k of ["smile","jaw","browUp","browDown","press","sneer"]) b[k] = Math.max(b[k], f[k] || 0);
+    if (f.blink && !W.prevBlink) b.blinks++; W.prevBlink = f.blink;
+    if (W.prevNose) b.motion += Math.hypot(f.nose[0]-W.prevNose[0], f.nose[1]-W.prevNose[1]) / f.width;
+    W.prevNose = f.nose; W.lostSince = null; $("faceWarn").hidden = true;
+  } else {
+    W.prevNose = null; W.lostSince ??= now;
+    if (now - W.lostSince > 15000) $("faceWarn").hidden = false;
+  }
+}
+function summarise(){
+  const keys = Object.keys(W.buckets).map(Number), n = Math.max(Math.ceil(film.duration || 0), keys.length ? Math.max(...keys)+1 : 0);
+  const z = () => Array(n).fill(0);
+  const out = { face:z(), attention:z(), motion:z(), blink:z(), smile:z(), jaw:z(), brow_up:z(), brow_down:z(), press:z(), sneer:z() };
+  const yaw = [], pitch = [], down = [], seen = [];
+  for (let s=0;s<n;s++){
+    const b = W.buckets[s]; if (!b || !b.frames || b.found < b.frames*.5) continue;
+    out.face[s] = 1; seen.push(s); yaw[s] = mean(b.yaw); pitch[s] = mean(b.pitch); down[s] = mean(b.down);
+    out.motion[s] = +b.motion.toFixed(4); out.blink[s] = b.blinks;
+    out.smile[s] = +b.smile.toFixed(3); out.jaw[s] = +b.jaw.toFixed(3); out.brow_up[s] = +b.browUp.toFixed(3);
+    out.brow_down[s] = +b.browDown.toFixed(3); out.press[s] = +b.press.toFixed(3); out.sneer[s] = +b.sneer.toFixed(3);
+  }
+  if (seen.length){
+    const y0 = median(seen.map(s=>yaw[s])), p0 = median(seen.map(s=>pitch[s])), d0 = median(seen.map(s=>down[s]));
+    for (const s of seen) out.attention[s] = (Math.abs(yaw[s]-y0) < 25 && Math.abs(pitch[s]-p0) < 20 && down[s]-d0 < .35) ? 1 : 0;
+  }
+  return { v:2, viewer_id:W.inv.id, name:W.inv.n, film:W.inv.t, studio:W.inv.st, dt:1, recorded_at:new Date().toISOString(), away_count:W.away, ...out };
+}
+function finishViewer(){
+  cancelAnimationFrame(W.raf); clearInterval(wmTimer); film.pause();
+  if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  closeCamera();
+  const watched = Object.keys(W.buckets).length;
+  if (watched < 20){ $("ovStart").hidden = false; $("ovStartTitle").textContent = "that was under 20 seconds"; W.buckets = {}; film.currentTime = 0; W.maxT = 0; return; }
+  W.session = summarise();
+  W.session.profile = Object.fromEntries(Object.entries(W.profile || {}).filter(([,v]) => v));
+  startSurvey();
+}
+/* ---- end-of-film survey ---- */
+const SV = { step:0, ans:{}, frames:[] };
+const SV_STEPS = ["recommend","watch","ending","stuck","words"];
+async function startSurvey(){
+  SV.step = 0; SV.ans = { stuck:[] }; SV.frames = [];
+  show("v-survey"); renderSurvey();
+  // pick this viewer's strongest moments as "what stuck" candidates
+  const s = W.session, D = s.face.length, v = prep(s, D), E = viewerEvents(v, D);
+  const inten = new Float32Array(D); for (let t=0;t<D;t++){ for (const k of LANES) inten[t] += E[k][t]; inten[t] += v.smile[t]*.5; }
+  const lo = 5, hi = Math.floor(D*.9); for (let t=0;t<D;t++) if (t<lo || t>hi) inten[t] = 0;
+  const sm = smooth(inten, 5); let picks = localPeaks(sm, 40, .3, 4).filter(t => t>=lo && t<=hi);
+  for (let k=1; picks.length < 6 && k < 12; k++){ const t = Math.floor(lo + (hi-lo)*k/12); if (picks.every(p => Math.abs(p-t) > 40)) picks.push(t); }
+  picks = picks.slice(0,6).sort((a,b) => a-b);
+  for (const t of picks){
+    const c = document.createElement("canvas"); c.width = 320; c.height = 180; const cx = c.getContext("2d");
+    try { film.currentTime = t; await once(film, "seeked", 5000); await new Promise(r => film.requestVideoFrameCallback ? (film.requestVideoFrameCallback(() => r()), setTimeout(r, 400)) : setTimeout(r, 150)); drawCover(cx, film, 320, 180); cx.getImageData(0,0,1,1); }
+    catch { drawPlaceholder(cx, 320, 180, t); }
+    SV.frames.push({ t, c });
+  }
+  if (SV_STEPS[SV.step] === "stuck") renderSurvey();
+}
+function renderSurvey(){
+  const key = SV_STEPS[SV.step];
+  $("svSteps").innerHTML = SV_STEPS.map((_,i) => `<i class="${i<=SV.step?"on":""}"></i>`).join("");
+  $("svNextWrap").hidden = true; $("svSkip").hidden = false; $("svSub").textContent = "";
+  if (SURVEY[key]){
+    const q = SURVEY[key]; $("svTitle").textContent = q.title;
+    $("svBody").innerHTML = `<div class="opts">${q.opts.map(([v,ic,l]) => `<button class="opt${SV.ans[key]===v?" on":""}" data-v="${v}"><i>${ic}</i>${l}</button>`).join("")}</div>`;
+  } else if (key === "stuck"){
+    $("svTitle").textContent = "which moment's gonna stick with you?"; $("svSub").textContent = "Pick up to two.";
+    if (!SV.frames.length){ $("svBody").innerHTML = `<p>loading moments…</p>`; return; }
+    $("svBody").innerHTML = `<div class="pick">${SV.frames.map((f,i) => `<button class="${SV.ans.stuck.includes(f.t)?"on":""}" data-i="${i}" aria-label="Moment at ${fmt(f.t)}"><span>${fmt(f.t)}</span></button>`).join("")}</div>`;
+    $("svBody").querySelectorAll(".pick button").forEach(b => b.prepend(SV.frames[+b.dataset.i].c));
+    $("svNextWrap").hidden = false; $("svNext").textContent = SV.ans.stuck.length ? "next" : "none of these really";
+  } else {
+    $("svTitle").textContent = "describe it in three words"; $("svSub").textContent = "First words that come to mind.";
+    $("svBody").innerHTML = `<input class="inp" id="svWords" maxlength="60" placeholder="funny, tense, weird" autocomplete="off" style="text-align:center; font-size:19px; font-weight:700; margin-top:10px">`;
+    $("svNextWrap").hidden = false; $("svNext").textContent = "finish"; $("svSkip").hidden = true;
+    setTimeout(() => $("svWords")?.focus(), 50);
+  }
+}
+$("svBody").onclick = e => {
+  const key = SV_STEPS[SV.step];
+  const o = e.target.closest(".opt");
+  if (o){ SV.ans[key] = o.dataset.v; renderSurvey(); setTimeout(svAdvance, 260); return; }
+  const p = e.target.closest(".pick button");
+  if (p){ const t = SV.frames[+p.dataset.i].t, a = SV.ans.stuck;
+    if (a.includes(t)) a.splice(a.indexOf(t),1); else { if (a.length >= 2) a.shift(); a.push(t); } renderSurvey(); }
+};
+$("svBody").addEventListener("keydown", e => { if (e.key === "Enter" && e.target.id === "svWords") svAdvance(); });
+function svAdvance(){
+  if (SV_STEPS[SV.step] === "words") SV.ans.words = ($("svWords")?.value || "").trim().slice(0,60);
+  if (SV.step >= SV_STEPS.length-1){ finishSurvey(); return; }
+  SV.step++; renderSurvey();
+}
+$("svNext").onclick = svAdvance;
+$("svSkip").onclick = svAdvance;
+function finishSurvey(){
+  const a = SV.ans; W.session.survey = { recommend:a.recommend||null, watch:a.watch||null, ending:a.ending||null, stuck:a.stuck||[], words:a.words||"" };
+  film.removeAttribute("src"); film.load();
+  showRecap();
+}
+function showRecap(){
+  const s = W.session, D = s.face.length, v = prep(s, D), E = viewerEvents(v, D);
+  const seen = s.face.reduce((a,b)=>a+b,0), watch = s.attention.reduce((a,b)=>a+b,0);
+  $("rcPct").textContent = seen ? Math.round(100*watch/seen) : 0;
+  $("rcWho").textContent = `${s.name.split(" ")[0]}'s screening recap`;
+  $("rcEmo").innerHTML = LANES.map(k => `<div class="emo"><i>${EMO[k].icon}</i><b>${onsets(E[k], k==="tension"||k==="confused" ? 12 : 2)}</b><span>${EMO[k].name.toLowerCase()}</span></div>`).join("");
+  const local = !!W.invite;
+  renderEarn(s, seen, watch);
+  $("rcStudio").hidden = !local;
+  if (!W.earn){ $("rcStudio").textContent = "see it in the studio view"; $("recapLead").textContent = local ? "Saved to the studio view on this device." : `Download your reactions and send them to ${s.studio}.`; }
+  $("rcNote").textContent = "";
+  if (local){ S.sessions.push(s); W.invite.done = true; renderInvites(); }
+  show("v-recap");
+}
+$("rcDownload").onclick = () => { const s = W.session; download(`${safe(s.film)}__${safe(s.name)}.json`, JSON.stringify(s)); $("rcNote").textContent = "Saved to your downloads. Text or email it to the host."; };
+$("rcStudio").onclick = () => { if (W.earn) openResults(false); else show("v-studio"); };
+function renderEarn(s, seen, watch){
+  const el = $("rcEarn");
+  if (!W.earn){ el.hidden = true; $("rcH").textContent = "that's a wrap 🎬"; return; }
+  const D = s.face.length, played = Object.keys(W.buckets).length, cov = played / Math.max(1, D), eyes = seen ? watch/seen : 0;
+  const ok = cov >= .9 && eyes >= .6;
+  if (ok && !W.paid){ walletMem = wallet.add(PAY); W.paid = true; }
+  el.hidden = false; el.className = "earn" + (ok ? "" : " no");
+  el.innerHTML = ok
+    ? `<div class="amt">+$${PAY.toFixed(2)}</div><div class="v">✓ verified watch · ${Math.round(eyes*100)}% eyes on screen</div>
+       <div class="bal"><span>Balance <b>$${balance().toFixed(2)}</b></span><button class="btn sm" id="cashOut">Cash out</button></div>`
+    : `<div class="amt">$0.00</div><div class="v">${cov < .9 ? `You watched ${Math.round(cov*100)}% of the film.` : `Eyes on screen ${Math.round(eyes*100)}% of the time.`} Finish the whole film, eyes on screen, to get paid.</div>
+       <div class="bal"><span>Balance <b>$${balance().toFixed(2)}</b></span><button class="btn sm ghost" id="tryAgain">Try again</button></div>`;
+  $("rcH").textContent = ok ? "you got paid 🎬" : "almost 🎬";
+  $("rcStudio").textContent = "see what the studio sees";
+  $("recapLead").textContent = ok ? "Your reactions went to the studio. Here's how you watched." : "Here's how you watched.";
+  if (ok && !matchMedia("(prefers-reduced-motion: reduce)").matches){
+    for (let i=0;i<14;i++){ const c = document.createElement("span"); c.className = "coin"; c.textContent = ["💸","💵","🪙"][i%3];
+      c.style.left = (5 + Math.random()*90) + "%"; c.style.animationDelay = (Math.random()*.6) + "s"; el.appendChild(c); setTimeout(() => c.remove(), 2600); }
+  }
+  el.querySelector("#cashOut")?.addEventListener("click", () => toast("Payouts aren't live in this demo yet"));
+  el.querySelector("#tryAgain")?.addEventListener("click", () => { W.paid = false; showHome(); });
+}
+
+/* ============================================================
+   RESULTS EDITOR
+   ============================================================ */
+const R = { pps:1, fit:1, t:0, playing:false, filter:"all", moments:[], thumbs:[], thumbMode:"placeholder", sel:null };
+const G = { ruler:26, strip:64, eng:52, lane:30, gap:6, pad:14 };
+const Y = { strip:G.ruler+2 }; Y.eng = Y.strip+G.strip+G.gap; Y.lane0 = Y.eng+G.eng+G.gap;
+const laneY = i => Y.lane0 + i*(G.lane+4);
+Y.drift = laneY(LANES.length) + G.gap - 4; const TLH = Y.drift + G.lane + 8;
+
+function buildDemo(){
+  const D = 1320, N = 14, R0 = rng(20261003);
+  const names = ["Maya","Jordan","Priya","Leo","Sam","Ava","Diego","Kai","Noor","Eli","Zoe","Theo","Ines","Marcus"];
+  const plan = [
+    ["laugh",42,.85,4],["laugh",150,.75,4],["laugh",212,.5,3],["laugh",468,.9,5],["laugh",522,.6,3],["laugh",705,.22,3],["laugh",812,.18,3],["laugh",1003,.35,3],["laugh",1268,.8,5],
+    ["surprise",300,.75,2],["surprise",1108,.9,2],["surprise",1213,.6,2],
+    ["tension",330,.7,24],["tension",955,.6,28],["tension",1192,.82,40],
+    ["confused",640,.42,45],["confused",692,.38,20],
+    ["cringe",806,.6,3],["cringe",823,.42,3]
+  ];
+  const dip = t => (t>600&&t<760) ? .55 : (t>880&&t<925) ? .25 : 0;
+  const sessions = [];
+  const AGES = ["18-24","25-34","35-44","45+","18-24","25-34","45+","18-24","35-44","25-34","45+","18-24","25-34","35-44"];
+  const ageF = { "18-24":1.25, "25-34":1.05, "35-44":.85, "45+":.68 };
+  for (let v=0; v<N; v++){
+    const profile = { age:AGES[v], gender: v===6 ? "nb" : (v%2 ? "man" : "woman"), freq: R0()<.45 ? "all" : R0()<.6 ? "some" : "rare", trailer: R0()<.5 ? "yes" : "no" };
+    const af = ageF[profile.age], ff = profile.freq === "all" ? 1.15 : .9;
+    const a = .8 + R0()*.35, leave = v===9 ? 735 : Infinity, z = () => Array(D).fill(0);
+    const s = { v:2, viewer_id:"demo"+v, name:names[v], dt:1, face:z(), attention:z(), motion:z(), blink:z(), smile:z(), jaw:z(), brow_up:z(), brow_down:z(), press:z(), sneer:z() };
+    let away = false;
+    const tensionAt = t => plan.some(p => p[0]==="tension" && t>=p[1] && t<p[1]+p[3]);
+    for (let t=0;t<D;t++){
+      if (t >= leave) break;
+      const q = (dip(t) + (af < 1 && t>770 && t<930 ? .45 : 0))/a*(2-af), tense = tensionAt(t);
+      if (!away && !tense && R0() < .004/af + .12*q*q) away = true; else if (away && R0() < .12 - .1*q) away = false;
+      s.face[t] = R0() < .994 ? 1 : 0; if (!s.face[t]) continue;
+      s.attention[t] = away ? 0 : 1;
+      s.motion[t] = +(Math.abs(R0()-.5)*.08*(tense?.4:1+2*q)).toFixed(4);
+      s.blink[t] = R0() < (tense ? .07 : .3 - .1*(1-q)*0) ? 1 : 0;
+      s.smile[t] = +(.03+R0()*.04).toFixed(3); s.jaw[t] = +(.04+R0()*.04).toFixed(3); s.brow_up[t] = +(.07+R0()*.05).toFixed(3);
+      s.brow_down[t] = +(.05+R0()*.05).toFixed(3); s.press[t] = +(.04+R0()*.04).toFixed(3); s.sneer[t] = +(.02+R0()*.03).toFixed(3);
+    }
+    const set = (k,t,val) => { if (t<D && t<leave && s.face[t]) s[k][t] = Math.max(s[k][t], +val.toFixed(3)); };
+    for (const [k,t0,p,dur] of plan){
+      if (t0 >= leave || !s.attention[t0]) continue;
+      if (k==="tension"){ for (let t=t0;t<t0+dur;t++) if (R0() < p*a*.55) set("press",t,.45+R0()*.2); continue; }
+      if (k==="confused"){ for (let t=t0;t<t0+dur;t++) if (R0() < p*a*.25) set("brow_down",t,.45+R0()*.2); continue; }
+      const pk = p*a*(k==="laugh"||k==="cringe" ? af : ff);
+      if (R0() > pk) continue;
+      const st = t0 + (R0()<.5?0:1);
+      for (let t=st;t<st+dur;t++){
+        if (k==="laugh"){ set("smile",t,.65+R0()*.3); set("jaw",t,.3+R0()*.25); }
+        if (k==="surprise"){ set("brow_up",t,.6+R0()*.25); set("jaw",t,.4+R0()*.2); if (t===st) s.motion[t] = .6; }
+        if (k==="cringe"){ set("sneer",t,.4+R0()*.2); }
+      }
+    }
+    s.profile = profile;
+    let att = 0, fc = 0; for (let t=0;t<D;t++){ fc += s.face[t]; att += s.attention[t]; }
+    const like = att/Math.max(1,fc) * (.75 + .35*af) + (R0()-.5)*.25 - (leave < D ? .4 : 0);
+    const recommend = like > 1.02 ? "definitely" : like > .9 ? "probably" : like > .75 ? "maybe" : "no";
+    const watch = recommend === "definitely" ? (R0() < .75 ? "theater" : "stream") : recommend === "probably" ? (R0() < .35 ? "theater" : "stream") : (R0() < .5 ? "stream" : "skip");
+    const er = R0() + (profile.freq === "rare" ? .25 : 0);
+    const ending = leave < D ? null : er < .42 ? "loved" : er < .72 ? "worked" : er < .92 ? "confused" : "letdown";
+    const pool = [[468,.5*af],[1108,.6],[1200,.45*ff],[806,.3*af],[300,.3],[42,.2*af],[960,.25]];
+    const stuck = []; while (stuck.length < 2){ let r = R0()*pool.reduce((x,y) => x+y[1], 0); for (const [t,w] of pool){ r -= w; if (r <= 0){ const tt = t + Math.round((R0()-.5)*10); if (stuck.every(x => Math.abs(x-tt) > 30) && tt < (leave===Infinity?D:leave)) stuck.push(tt); break; } } if (R0() < .25) break; }
+    const words = af > 1 ? ["funny","chaotic","wild","hilarious","tense","weird","unhinged","iconic"] : ["tense","slow","dark","clever","awkward","heartfelt","funny","messy"];
+    const pickW = () => words[Math.floor(R0()*words.length)]; const ws = new Set(); while (ws.size < 3) ws.add(pickW());
+    s.survey = { recommend: leave < D ? "no" : recommend, watch: leave < D ? "skip" : watch, ending, stuck, words:[...ws].join(", ") };
+    sessions.push(s);
+  }
+  return { sessions, D, title:"Landlord", meta:"short film, cut 3" };
+}
+
+async function openResults(demo){
+  stopPlay();
+  let sessions, D, title, src = "";
+  if (demo){ const d = buildDemo(); sessions = d.sessions; D = d.D; title = d.title; R.demo = true; R.metaNote = "Sample screening, simulated data"; }
+  else {
+    sessions = S.sessions; R.demo = false;
+    D = S.film?.duration || Math.max(...sessions.map(s => s.face.length));
+    title = S.film?.title || sessions[0]?.film || "Untitled screening"; src = S.film?.src || "";
+    R.metaNote = src ? "" : "No film loaded, showing timecodes only";
+  }
+  R.D = D; R.title = title; R.src = src; R.all = sessions; R.seg = "all";
+  R.scenes = demo ? demoScenes(D) : await loadScenes(); R.aiNotes = {}; R.notesBusy = false;
+  checkClaude();
+  R.segStats = computeSegStats(sessions, D);
+  R.sessions = sessions; R.A = analyse(sessions, D);
+  R.t = 0; R.filter = "all"; R.sel = null;
+  R.thumbs = []; R.thumbMode = demo ? "demo" : (src ? "loading" : "placeholder"); thumbCache.clear();
+  show("v-results");
+  $("rsTitle").textContent = title;
+  $("rsMeta").textContent = `${R.A.N} viewer${R.A.N===1?"":"s"} · ${fmt(D)}` + (R.metaNote ? ` · ${R.metaNote}` : "");
+  const pvV = $("pvVideo");
+  if (src){ pvV.hidden = false; $("pvCanvas").hidden = true; pvV.src = src; } else { pvV.hidden = true; pvV.removeAttribute("src"); $("pvCanvas").hidden = false; }
+  buildMoments(); renderStats(); renderFilters(); renderMoments(); renderSegbar(); renderReport();
+  layoutTimeline(true);
+  if (src) buildThumbs(src, D);
+  setTime(R.moments.length ? R.moments[0].t : 0, true);
+}
+
+function buildMoments(){
+  const A = R.A, m = [];
+  A.peaks.fire.forEach((t,i) => m.push({ t, type:"fire", title: i===0 ? "Most engaged moment" : "Locked in", detail:`Engagement ${Math.round(A.eng[t])} vs ${Math.round(A.avg)} average`, score:A.eng[t] }));
+  const top = { laugh:"Biggest laugh", surprise:"Biggest gasp", tension:"Peak tension", confused:"Most confused", cringe:"Biggest cringe" };
+  const other = { laugh:"Laugh", surprise:"Gasp", tension:"Tension", confused:"Confusion", cringe:"Cringe" };
+  for (const k of LANES) A.peaks[k].forEach((t,i) => {
+    const c = A.count[k][t], r = A.inRoom[t];
+    m.push({ t, type:k, title: i===0 ? top[k] : other[k], detail:`${c} of ${r} ${EMO[k].verb}`, score:A.share[k][t] });
+  });
+  A.lost.forEach(d => m.push({ t:d.s, end:d.e, type:"drift", title:"Lost them here", detail:`Engagement fell to ${Math.round(d.min)} for ${fmt(d.e-d.s)}`, score:1 }));
+  A.walkouts.forEach(w => m.push({ t:w.t, type:"drift", title:`${w.name} left`, detail:`Stopped watching with ${fmt(R.D-w.t)} to go`, walk:true, score:.5 }));
+  stuckClusters(R.sessions).slice(0,3).forEach((c,i) => m.push({ t:c.t, type:"remember", title: i===0 ? "Most remembered" : "Remembered", detail:`${c.n} of ${c.of} said this stuck with them`, score:2+c.n }));
+  m.forEach(x => { const sc = sceneOf(x.t); if (sc) x.scene = sc.title; });
+  R.moments = m.sort((a,b) => a.t-b.t).map((x,i) => ({ ...x, i }));
+}
+function renderStats(){
+  const A = R.A, best = A.peaks.fire[0], tl = A.totals;
+  const sv = surveyOf(R.sessions);
+  const items = [
+    { b: Math.round(A.avg), s: "engagement score", hot:true },
+    ...(sv.n ? [{ b: Math.round(100*sv.top2) + "%", s: "would recommend" }, { b: Math.round(100*(sv.watch.theater||0)/Math.max(1,sv.nWatch)) + "%", s: "would pay for theaters" }] : []),
+    { b: best!=null ? fmt(best) : "–", s: "most engaged moment" },
+    ...LANES.map(k => ({ b: `${EMO[k].icon} ${tl[k]}`, s: EMO[k].name.toLowerCase() })),
+    { b: A.lost.length ? fmt(A.lost[0].s) : "none", s: A.lost.length ? "first time you lost them" : "places you lost them" },
+    { b: `${A.walkouts.length}`, s: "walked out" }
+  ];
+  $("rsStats").innerHTML = items.map(x => `<div class="stat${x.hot?" hot":""}"><b>${x.b}</b><span>${x.s}</span></div>`).join("");
+}
+function renderFilters(){
+  const keys = ["all","fire","remember",...LANES,"drift"];
+  $("filters").innerHTML = keys.map(k => `<button aria-pressed="${R.filter===k}" data-f="${k}">${k==="all" ? "All" : EMO[k].icon + " " + EMO[k].name}</button>`).join("");
+}
+$("filters").onclick = e => { const b = e.target.closest("[data-f]"); if (!b) return; R.filter = b.dataset.f; renderFilters(); renderMoments(); };
+function renderMoments(){
+  const list = R.moments.filter(m => R.filter==="all" || m.type===R.filter);
+  if (!list.length){ $("mlist").innerHTML = `<p class="empty" style="padding:8px 8px">Nothing here. Try another filter.</p>`; return; }
+  $("mlist").innerHTML = list.map(m => `<button class="mom${R.sel===m.i?" on":""}" data-m="${m.i}">
+    <span class="th"><canvas width="168" height="94" data-th="${m.t}"></canvas><i>${EMO[m.type].icon}</i></span>
+    <span class="tx"><b>${esc(m.title)}</b><span>${esc(m.detail)}${m.scene ? " · " + esc(m.scene) : ""}</span></span>
+    <span class="tm">${fmt(m.t)}</span></button>`).join("");
+  paintMomentThumbs();
+}
+function paintMomentThumbs(){ document.querySelectorAll("#mlist canvas[data-th]").forEach(c => paintThumb(c.getContext("2d"), 168, 94, +c.dataset.th)); }
+$("mlist").onclick = e => { const b = e.target.closest("[data-m]"); if (b) selectMoment(+b.dataset.m, true); };
+function selectMoment(i, scrollTl){
+  const m = R.moments[i]; R.sel = i; stopPlay(); setTime(m.t, scrollTl);
+  document.querySelectorAll(".mom").forEach(el => el.classList.toggle("on", +el.dataset.m === i));
+  document.querySelectorAll(".mk").forEach(el => el.classList.toggle("on", +el.dataset.m === i));
+  document.querySelector(`.mom[data-m="${i}"]`)?.scrollIntoView({ block:"nearest" });
+}
+
+/* ---- film understanding: scenes ---- */
+async function loadScenes(){
+  const url = S.film?.meta; if (!url) return null;
+  try { const r = await fetch(url); if (!r.ok) return null; const j = await r.json(); return Array.isArray(j.scenes) && j.scenes.length ? j.scenes : null; } catch { return null; }
+}
+function sceneOf(t){ const sc = R.scenes; if (!sc) return null; return sc.find(x => t >= x.start && t < x.end) || null; }
+function sceneStats(){
+  const A = R.A; if (!R.scenes) return [];
+  const stuck = []; R.sessions.forEach(s => (s.survey?.stuck || []).forEach(t => stuck.push(+t)));
+  return R.scenes.map(sc => {
+    const a = Math.max(0, Math.floor(sc.start)), b = Math.min(R.D, Math.ceil(sc.end)); let e = 0, at = 0, n = 0; const mx = {}; LANES.forEach(k => mx[k] = 0);
+    for (let t=a; t<b; t++){ if (!A.inRoom[t]) continue; e += A.eng[t]; at += A.attn[t]; n++; LANES.forEach(k => mx[k] = Math.max(mx[k], A.share[k][t])); }
+    const top = LANES.reduce((x,k) => mx[k] > mx[x] ? k : x, LANES[0]);
+    return { ...sc, eng: n ? e/n : 0, attn: n ? at/n : 0, peak:mx, top, walk: A.walkouts.filter(w => w.t >= a && w.t < b).length, remembered: stuck.filter(t => t >= a && t < b).length };
+  });
+}
+
+/* ---- audience notes (rules now, Claude when a key is set) ---- */
+let claudeOK = null;
+async function checkClaude(){
+  if (claudeOK !== null) return;
+  try { const r = await fetch("/api/status"); const j = await r.json(); claudeOK = !!j.claude; R.claudeModel = j.model; } catch { claudeOK = false; }
+  if (!$("v-results").hidden) renderReport();
+}
+const pct = v => Math.round(v*100) + "%";
+const confOf = n => n >= 30 ? "high" : n >= 10 ? "medium" : "low";
+function ruleNotes(){
+  const A = R.A, N = A.N, sv = surveyOf(R.sessions), c = confOf(N), notes = [];
+  const nm = t => { const sc = sceneOf(t); return sc ? `“${sc.title}”` : `the stretch at ${fmt(t)}`; };
+  let dropScene = null;
+  if (A.lost.length){
+    const d = [...A.lost].sort((a,b) => b.sev - a.sev)[0], walks = A.walkouts.filter(w => w.t >= d.s-30 && w.t <= d.e+30).length;
+    const cf = A.peaks.confused.find(t => t >= d.s-15 && t <= d.e+15); dropScene = sceneOf(d.s);
+    notes.push({ area:"Edit", p:1, conf:c, title:`Tighten ${nm(d.s)}`,
+      body:`Engagement fell to ${Math.round(d.min)} against a film average of ${Math.round(A.avg)} for ${fmt(d.e-d.s)}${walks ? `, and ${walks} of ${A.walkouts.length} walkout${A.walkouts.length>1?"s":""} happened around here` : ""}${cf!=null ? `. Confusion also peaks inside it` : ""}. Try trimming it or reaching its payoff sooner.`,
+      ev:[{ t:d.s, l:`${fmt(d.s)} drop starts` }, ...(cf!=null ? [{ t:cf, l:`${fmt(cf)} confusion` }] : []), ...A.walkouts.filter(w => w.t >= d.s-30 && w.t <= d.e+30).slice(0,2).map(w => ({ t:w.t, l:`${fmt(w.t)} ${w.name} left` }))] });
+  }
+  const cf = A.peaks.confused[0];
+  if (cf != null && A.share.confused[cf] >= .2 && sceneOf(cf) !== dropScene)
+    notes.push({ area:"Edit", p:2, conf:c, title:`Clarify ${nm(cf)}`, body:`${A.count.confused[cf]} of ${A.inRoom[cf]} looked confused here. If it's meant to be a mystery, keep it. If not, a clarifying line or an insert shot should fix it.`, ev:[{ t:cf, l:`${fmt(cf)} confusion peak` }] });
+  if (sv.nEnd){
+    const ok = ((sv.ending.loved||0)+(sv.ending.worked||0))/sv.nEnd, last = R.scenes ? R.scenes.filter(x => x.tone !== "credits").slice(-1)[0] : null;
+    const gs = R.segStats.filter(g => g.id !== "all" && g.n >= 2 && g.endOk != null).sort((a,b) => b.endOk - a.endOk);
+    const split = gs.length >= 2 && gs[0].endOk - gs[gs.length-1].endOk >= .25 ? ` It works for ${gs[0].label} (${pct(gs[0].endOk)}) but not ${gs[gs.length-1].label} (${pct(gs[gs.length-1].endOk)}).` : "";
+    if (ok < .6) notes.push({ area:"Edit", p:1, conf:confOf(sv.nEnd), title:"The ending splits the room", body:`Only ${pct(ok)} said the ending worked. ${sv.ending.confused||0} were confused and ${sv.ending.letdown||0} felt let down.${split}`, ev: last ? [{ t:last.start, l:`${fmt(last.start)} ${last.title}` }] : [] });
+    else if (split && gs[0].endOk - gs[gs.length-1].endOk >= .4) notes.push({ area:"Edit", p:1, conf:confOf(Math.min(gs[0].n, gs[gs.length-1].n)), title:`The ending works for ${gs[0].label}, not ${gs[gs.length-1].label}`, body:`Overall ${pct(ok)} said the ending worked, but that hides a split:${split} If ${gs[gs.length-1].label} is your target audience, this is the scene to rework.`, ev: last ? [{ t:last.start, l:`${fmt(last.start)} ${last.title}` }] : [] });
+    else notes.push({ area:"Edit", p:3, conf:confOf(sv.nEnd), title:"The ending lands", body:`${pct(ok)} loved the ending or said it worked.${split} Protect it in the next cut.`, ev: last ? [{ t:last.start, l:`${fmt(last.start)} ${last.title}` }] : [] });
+  }
+  const lg = A.peaks.laugh[0];
+  if (lg != null) notes.push({ area:"Edit", p:3, conf:c, title:`Protect ${nm(lg)}`, body:`Your biggest laugh: ${A.count.laugh[lg]} of ${A.inRoom[lg]} laughed. Don't trim around it, and leave a beat after it so the next line isn't buried.`, ev:[{ t:lg, l:`${fmt(lg)} biggest laugh` }] });
+  const segs = R.segStats.filter(g => g.id !== "all" && g.n >= 2 && g.rec != null).sort((a,b) => b.rec - a.rec);
+  if (segs.length >= 2 && segs[0].rec - segs[segs.length-1].rec >= .2){
+    const b = segs[0], w = segs[segs.length-1];
+    notes.push({ area:"Marketing", p:2, conf:confOf(Math.min(b.n, w.n)), title:`Lead the campaign with ${b.label}`, body:`${pct(b.rec)} of ${b.label} would recommend it vs ${pct(w.rec)} of ${w.label}${b.laughs > w.laughs*1.2 ? `, and they laughed ${(b.laughs/Math.max(.1,w.laughs)).toFixed(1)}x as much` : ""}. Skew ad spend toward them and lead with the moments they reacted to most.`, ev:[] });
+  }
+  const pick = [], add = m => { if (m && pick.every(x => Math.abs(x.t - m.t) > 20)) pick.push(m); };
+  const by = k => R.moments.filter(m => m.type === k);
+  by("laugh").sort((a,b) => b.score-a.score).slice(0,2).forEach(add); add(by("surprise").sort((a,b) => b.score-a.score)[0]);
+  add(by("remember").sort((a,b) => b.score-a.score)[0]); add(by("fire").sort((a,b) => b.score-a.score)[0]); add(by("tension").sort((a,b) => b.score-a.score)[0]);
+  if (pick.length >= 2) notes.push({ area:"Marketing", p:2, conf:c, title:"Trailer and social clips: start here", body:`The ${pick.length} moments the audience reacted to hardest. Cut 15–30 second vertical clips around each one for TikTok and Reels.`, ev:pick.sort((a,b) => a.t-b.t).map(m => ({ t:m.t, l:`${fmt(m.t)} ${EMO[m.type].icon} ${m.scene || m.title}` })) });
+  if (sv.nWatch){
+    const th = (sv.watch.theater||0)/sv.nWatch, st = (sv.watch.stream||0)/sv.nWatch;
+    notes.push({ area:"Release", p:2, conf:confOf(sv.nWatch), title: th >= .45 ? "There's real theatrical appetite" : th >= .25 ? "Streaming-first, with event screenings" : "Lead with streaming",
+      body: th >= .45 ? `${pct(th)} would pay to see it in theaters. Worth a festival run or a limited theatrical release before streaming.` : th >= .25 ? `${pct(th)} would see it in theaters and ${pct(st)} would wait for streaming. A streaming release with a few event screenings fits.` : `Only ${pct(th)} would pay for theaters; ${pct(st)} would wait for streaming.`, ev:[] });
+  }
+  if (N < 30){
+    const small = R.segStats.filter(g => g.id !== "all" && g.n > 0 && g.n < 10).map(g => g.label);
+    notes.push({ area:"Next screening", p:3, conf:"high", title:`Screen at least ${30-N} more people`, body:`With ${N} viewer${N>1?"s":""}, treat these notes as directional.${small.length ? ` Groups under 10 people: ${small.join(", ")}. Recruit more of them before trusting gaps between groups.` : ""}`, ev:[] });
+  }
+  return notes.sort((a,b) => a.p - b.p);
+}
+function claudePayload(){
+  const A = R.A, sv = surveyOf(R.sessions), wc = {};
+  R.sessions.forEach(s => (s.survey?.words || "").toLowerCase().split(/[^a-z'-]+/).filter(w => w.length > 2).forEach(w => wc[w] = (wc[w]||0)+1));
+  const r1 = v => Math.round(v*100)/100;
+  return {
+    film:{ title:R.title, duration_s:R.D }, audience_group: SEGS.find(g => g.id === R.seg).label, viewers:A.N, engagement_avg:Math.round(A.avg),
+    scenes: sceneStats().map(x => ({ title:x.title, start_s:Math.round(x.start), end_s:Math.round(x.end), caption:x.caption, tone:x.tone, dialogue:(x.dialogue||"").slice(0,400),
+      engagement:Math.round(x.eng), attention:r1(x.attn), peak_share:Object.fromEntries(LANES.map(k => [k, r1(x.peak[k])])), walkouts:x.walk, remembered_by:x.remembered })),
+    moments: R.moments.map(m => ({ t:m.t, type:m.type, title:m.title, detail:m.detail, scene:m.scene || null })),
+    lost_stretches: A.lost.map(d => ({ start_s:d.s, end_s:d.e, min_engagement:Math.round(d.min) })),
+    walkouts: A.walkouts.map(w => w.t),
+    survey: { answered:sv.n, recommend:sv.rec, watch:sv.watch, ending:sv.ending },
+    groups: R.segStats.filter(g => g.n > 0).map(g => ({ group:g.label, n:g.n, engagement:Math.round(g.eng||0), laughs_per_person:g.laughs!=null ? r1(g.laughs) : null, recommend:g.rec, theaters:g.theater, ending_worked:g.endOk })),
+    three_words: Object.entries(wc).sort((a,b) => b[1]-a[1]).slice(0,20)
+  };
+}
+async function askClaude(){
+  if (R.notesBusy) return; R.notesBusy = true; renderReport();
+  try {
+    const r = await fetch("/api/notes", { method:"POST", headers:{ "Content-Type":"application/json" }, body:JSON.stringify(claudePayload()) });
+    const j = await r.json(); if (!r.ok || !Array.isArray(j.notes)) throw new Error(j.error || "No notes came back");
+    R.aiNotes[R.seg] = j.notes.filter(n => n && n.title).map(n => ({ area:String(n.area||"Edit"), p:clamp(+n.priority||2,1,3), conf:["low","medium","high"].includes(n.confidence) ? n.confidence : "medium",
+      title:String(n.title), body:String(n.body||""), ev:(Array.isArray(n.evidence) ? n.evidence : []).filter(e => isFinite(+e.t)).slice(0,5).map(e => ({ t:clamp(+e.t,0,R.D-1), l:`${fmt(+e.t)} ${String(e.label||"").slice(0,40)}` })) }))
+      .sort((a,b) => a.p - b.p);
+  } catch (e) { toast("Claude couldn't write notes: " + String(e.message || e).slice(0,80)); }
+  R.notesBusy = false; renderReport();
+}
+function notesCard(){
+  const ai = R.aiNotes?.[R.seg], notes = ai || ruleNotes();
+  const src = ai ? `<span class="badge ai">✨ Written by Claude${R.claudeModel ? " · " + esc(R.claudeModel) : ""}</span>` : `<span class="badge">Smart rules</span>`;
+  const btn = claudeOK ? `<button class="ask" id="askClaude" ${R.notesBusy ? "disabled" : ""}>${ai ? "✨ Rewrite with Claude" : "✨ Ask Claude for deeper notes"}</button>`
+    : `<span class="askhint">Deeper notes from Claude unlock when you run serve.py with your API key.</span>`;
+  const body = R.notesBusy ? `<div class="nload"><i></i>Claude is reading the screening, scene by scene…</div>`
+    : notes.length ? `<ol class="nlist">${notes.map(n => `<li class="ni p${n.p}"><div class="ntop"><span class="area">${esc(n.area)}</span><span class="cf ${n.conf}">${n.conf} confidence</span></div>
+      <b>${esc(n.title)}</b><p>${esc(n.body)}</p>${n.ev.length ? `<div class="ev">${n.ev.map(e => `<button data-t="${e.t}">${esc(e.l)}</button>`).join("")}</div>` : ""}</li>`).join("")}</ol>`
+    : `<p class="none">Not enough data for notes yet.</p>`;
+  return `<div class="rcard wide notes"><div class="nhead"><div><h3>Audience notes</h3><p class="q">What the audience is telling you, ranked by impact. Click any evidence to jump to it.</p></div><div class="nsrc">${src}${btn}</div></div>${body}</div>`;
+}
+function scenesCard(){
+  const st = sceneStats(); if (!st.length) return "";
+  const real = st.filter(x => x.tone !== "credits"), hi = Math.max(...real.map(x => x.eng)), lo = Math.min(...real.map(x => x.eng));
+  return `<div class="rcard wide"><h3>Scene by scene</h3><p class="q">Scenes found automatically and named from the picture${st.some(x => x.dialogue) ? " and dialogue" : ""}. Click a scene to jump to it.</p>
+    <div class="tscroll"><table class="scn"><thead><tr><th></th><th>Scene</th><th>Time</th><th>Engagement</th><th>Strongest reaction</th><th>Eyes on screen</th><th>⭐</th></tr></thead><tbody>${
+    st.map(x => { const cls = x.tone === "credits" || hi - lo < 4 ? "" : x.eng === hi ? "best" : x.eng === lo ? "worst" : "";
+      return `<tr data-t="${x.start}"><td><canvas width="192" height="108" data-th="${(x.start + x.end)/2}"></canvas></td>
+      <td class="tt"><b>${esc(x.title)} <span class="tone">${esc(x.tone||"")}</span></b><span>${esc(x.caption||"")}</span></td>
+      <td>${fmt(x.start)}–${fmt(x.end)}</td><td class="${cls}">${Math.round(x.eng)}</td>
+      <td>${x.peak[x.top] >= .05 ? `${EMO[x.top].icon} ${pct(x.peak[x.top])}` : "–"}</td><td>${pct(x.attn)}</td><td>${x.remembered || ""}</td></tr>`; }).join("")}</tbody></table></div></div>`;
+}
+
+/* ---- segments + report ---- */
+function surveyOf(list){
+  const out = { n:0, rec:{}, watch:{}, ending:{}, nRec:0, nWatch:0, nEnd:0, top2:0 };
+  for (const s of list){ const v = s.survey; if (!v) continue;
+    if (v.recommend){ out.rec[v.recommend] = (out.rec[v.recommend]||0)+1; out.nRec++; }
+    if (v.watch){ out.watch[v.watch] = (out.watch[v.watch]||0)+1; out.nWatch++; }
+    if (v.ending){ out.ending[v.ending] = (out.ending[v.ending]||0)+1; out.nEnd++; } }
+  out.n = Math.max(out.nRec, out.nWatch, out.nEnd);
+  out.top2 = out.nRec ? ((out.rec.definitely||0)+(out.rec.probably||0))/out.nRec : 0;
+  return out;
+}
+function stuckClusters(list){
+  const ts = []; list.forEach(s => (s.survey?.stuck || []).forEach(t => ts.push(+t)));
+  ts.sort((a,b) => a-b); const cl = [];
+  for (const t of ts){ const c = cl[cl.length-1]; if (c && t - c.last <= 25){ c.sum += t; c.n++; c.last = t; } else cl.push({ sum:t, n:1, last:t }); }
+  const answered = list.filter(s => s.survey).length;
+  return cl.map(c => ({ t:Math.round(c.sum/c.n), n:c.n, of:answered })).sort((a,b) => b.n-a.n);
+}
+function computeSegStats(all, D){
+  return SEGS.map(g => { const list = all.filter(g.f); if (!list.length) return { ...g, n:0 };
+    const A = analyse(list, D), sv = surveyOf(list);
+    return { ...g, n:list.length, eng:A.avg, laughs:A.totals.laugh/list.length, rec:sv.nRec ? sv.top2 : null, theater:sv.nWatch ? (sv.watch.theater||0)/sv.nWatch : null, endOk:sv.nEnd ? ((sv.ending.loved||0)+(sv.ending.worked||0))/sv.nEnd : null };
+  });
+}
+function renderSegbar(){
+  const vis = R.segStats.filter(g => g.id === "all" || g.n > 0);
+  $("segbar").hidden = vis.length < 2;
+  $("segbar").innerHTML = `<span>Show</span>` + vis.map(g => `<button aria-pressed="${R.seg===g.id}" data-seg="${g.id}">${g.label}<small>${g.n}</small></button>`).join("");
+}
+function setSegment(id){
+  const g = SEGS.find(x => x.id === id) || SEGS[0], list = R.all.filter(g.f);
+  if (!list.length) return;
+  stopPlay(); R.seg = g.id; R.sessions = list; R.A = analyse(list, R.D); R.sel = null;
+  $("rsMeta").textContent = `${R.A.N} of ${R.all.length} viewer${R.all.length===1?"":"s"}${g.id==="all" ? "" : " · " + g.label} · ${fmt(R.D)}` + (R.metaNote ? ` · ${R.metaNote}` : "");
+  buildMoments(); renderStats(); renderMoments(); renderSegbar(); renderReport(); placeMarkers(); drawTimeline(); setTime(R.t);
+}
+$("segbar").onclick = e => { const b = e.target.closest("[data-seg]"); if (b) setSegment(b.dataset.seg); };
+function hbar(counts, total, Q){
+  const keys = Object.keys(Q.label);
+  return `<div class="hbar">${keys.map(k => { const v = counts[k]||0; if (!v) return ""; const p = v/total*100;
+    return `<div style="width:${p}%;background:${Q.colors[k]}" title="${Q.label[k]} ${Math.round(p)}%">${p >= 12 ? Math.round(p)+"%" : ""}</div>`; }).join("")}</div>
+    <div class="lg">${keys.map(k => `<span><i style="background:${Q.colors[k]}"></i>${Q.label[k]} <b>${counts[k]||0}</b></span>`).join("")}</div>`;
+}
+function renderReport(){
+  const list = R.sessions, A = R.A, sv = surveyOf(list), seg = SEGS.find(g => g.id === R.seg);
+  $("rhSub").textContent = (seg.id === "all" ? "Everyone" : seg.label) + ` · ${list.length} viewer${list.length===1?"":"s"}` + (sv.n ? ` · ${sv.n} answered the survey` : "");
+  const none = msg => `<p class="none">${msg}</p>`;
+  const cards = [notesCard()];
+  // recommend
+  cards.push(`<div class="rcard"><h3>Would they recommend it?</h3><p class="q">"Would you tell a friend to watch it?"</p>${
+    sv.nRec ? `<div class="bigstat">${Math.round(sv.top2*100)}%<small>definitely or probably</small></div>${hbar(sv.rec, sv.nRec, SURVEY.recommend)}` : none("No survey answers yet.")}</div>`);
+  // watch
+  cards.push(`<div class="rcard"><h3>Theaters, streaming or skip</h3><p class="q">"If it came out tomorrow, you'd…"</p>${
+    sv.nWatch ? `<div class="bigstat">${Math.round((sv.watch.theater||0)/sv.nWatch*100)}%<small>would see it in theaters</small></div>${hbar(sv.watch, sv.nWatch, SURVEY.watch)}` : none("No survey answers yet.")}</div>`);
+  // ending
+  const tail = Math.min(600, Math.max(60, Math.round(R.D*.1))); let es = 0, en = 0;
+  for (let t = R.D - tail; t < R.D; t++) if (A.inRoom[t]){ es += A.eng[t]; en++; }
+  const endEng = en ? es/en : 0, diff = Math.round(endEng - A.avg);
+  cards.push(`<div class="rcard"><h3>The ending</h3><p class="q">"That ending…"</p>${
+    sv.nEnd ? `<div class="bigstat">${Math.round(((sv.ending.loved||0)+(sv.ending.worked||0))/sv.nEnd*100)}%<small>loved it or said it worked</small></div>${hbar(sv.ending, sv.nEnd, SURVEY.ending)}` : none("No survey answers yet.")}
+    <p class="note">Engagement in the last ${fmt(tail)}: <b>${Math.round(endEng)}</b>, ${diff >= 0 ? `<b>${diff} above</b>` : `<b>${-diff} below</b>`} the film's average.</p></div>`);
+  // who it works for
+  const rows = R.segStats.filter(g => g.n > 0);
+  const cols = [["eng","Engagement",v => Math.round(v)],["laughs","Laughs per person",v => v.toFixed(1)],["rec","Would recommend",v => Math.round(v*100)+"%"],["theater","Theaters",v => Math.round(v*100)+"%"],["endOk","Ending worked",v => Math.round(v*100)+"%"]];
+  const ext = {}; cols.forEach(([k]) => { const vals = rows.filter(r => r.id !== "all" && r.n >= 2 && r[k] != null).map(r => r[k]); const gap = { eng:4, laughs:.6 }[k] ?? .15; ext[k] = vals.length >= 2 && Math.max(...vals) - Math.min(...vals) >= gap ? [Math.min(...vals), Math.max(...vals)] : null; });
+  const cell = (r,[k,,f]) => { if (r[k] == null) return `<td class="none">–</td>`; const e = ext[k], cls = r.id !== "all" && r.n >= 2 && e && e[0] !== e[1] ? (r[k] === e[1] ? "best" : r[k] === e[0] ? "worst" : "") : "";
+    return `<td class="${cls}">${f(r[k])}${k === "eng" ? `<span class="meter"><i style="width:${clamp(r[k],0,100)}%"></i></span>` : ""}</td>`; };
+  cards.push(`<div class="rcard wide"><h3>Who it works for</h3><p class="q">Green is the strongest group for each measure, red the weakest. Click a row to see the timeline for that group.</p>${
+    rows.length > 1 ? `<div class="tscroll"><table class="segt"><thead><tr><th>Group</th><th>Viewers</th>${cols.map(c => `<th>${c[1]}</th>`).join("")}</tr></thead><tbody>${
+      rows.map(r => `<tr class="${R.seg===r.id?"on":""}" data-seg="${r.id}"><td><b>${r.label}</b></td><td>${r.n}</td>${cols.map(c => cell(r,c)).join("")}</tr>`).join("")}</tbody></table></div>`
+    : none("Viewers who fill in the quick vibe check before watching get broken out here.")}</div>`);
+  // what stuck
+  const cl = stuckClusters(list).slice(0,6);
+  cards.push(`<div class="rcard wide"><h3>What stuck with them</h3><p class="q">"Which moment's gonna stick with you?" These are the scenes people will talk about.</p>${
+    cl.length ? `<div class="stuckl">${cl.map(c => `<button data-t="${c.t}"><span class="th"><canvas width="280" height="158" data-th="${c.t}"></canvas><b>⭐ ${c.n}</b></span><span>${fmt(c.t)}${sceneOf(c.t) ? " · " + esc(sceneOf(c.t).title) : ""}</span></button>`).join("")}</div>` : none("No picks yet.")}</div>`);
+  // words
+  const wc = {}; list.forEach(s => (s.survey?.words || "").toLowerCase().split(/[^a-z'’-]+/).filter(w => w.length > 1 && !["and","the","but","very","kind","of","a","so","it"].includes(w)).forEach(w => wc[w] = (wc[w]||0)+1));
+  const top = Object.entries(wc).sort((a,b) => b[1]-a[1]).slice(0,24), mx = top[0]?.[1] || 1;
+  const wcol = ["#FF7A45","#C9B8FF","#FFC857","#8BE39B","#5FD3F3","#F6EFE6"];
+  cards.push(`<div class="rcard wide"><h3>In their words</h3><p class="q">"Describe it in three words." Bigger means more people said it. Good raw material for taglines.</p>${
+    top.length ? `<div class="words">${top.map(([w,n],i) => `<span style="font-size:${15 + 26*n/mx}px;color:${wcol[i%wcol.length]}" title="${n} said this">${esc(w)}</span>`).join("")}</div>` : none("No answers yet.")}</div>`);
+  cards.push(scenesCard());
+  $("report").innerHTML = cards.join("");
+  $("report").querySelectorAll("canvas[data-th]").forEach(c => paintThumb(c.getContext("2d"), 280, 158, +c.dataset.th));
+}
+$("report").onclick = e => {
+  if (e.target.closest("#askClaude")){ askClaude(); return; }
+  const r = e.target.closest("tr[data-seg]"); if (r){ setSegment(r.dataset.seg); window.scrollTo({ top:0, behavior:"smooth" }); return; }
+  const b = e.target.closest("button[data-t], tr[data-t]"); if (b){ stopPlay(); setTime(+b.dataset.t, true); window.scrollTo({ top:0, behavior:"smooth" }); }
+};
+
+/* ---- thumbnails ---- */
+function paintThumb(ctx, w, h, t){
+  if (R.thumbMode === "demo"){ drawFrame(ctx, w, h, t); return; }
+  if (R.thumbs.length){ const n = R.thumbs.length, i = clamp(Math.floor(t / R.D * n), 0, n-1); const th = R.thumbs[i];
+    if (th){ ctx.drawImage(th, 0, 0, w, h); return; } }
+  drawPlaceholder(ctx, w, h, t);
+}
+async function buildThumbs(src, D){
+  const token = R.thumbToken = Math.random();
+  const v = document.createElement("video"); v.muted = true; v.preload = "auto";
+  if (/^https?:/.test(src)) v.crossOrigin = "anonymous";
+  v.src = src;
+  try { await once(v, "loadeddata", 20000); } catch { R.thumbMode = "placeholder"; $("thumbProg").textContent = "Film strip unavailable for this link"; drawTimeline(); return; }
+  const n = clamp(Math.ceil(D/10), 24, 160), tmp = new Array(n);
+  R.thumbs = tmp; R.thumbMode = "real";
+  for (let i=0;i<n;i++){
+    if (R.thumbToken !== token) return;
+    v.currentTime = Math.min(D - .5, (i + .5) * D / n);
+    try { await once(v, "seeked", 8000); } catch { continue; }
+    const c = document.createElement("canvas"); c.width = 192; c.height = 108; const cx = c.getContext("2d");
+    drawCover(cx, v, 192, 108);
+    try { cx.getImageData(0,0,1,1); } catch { R.thumbs = []; R.thumbMode = "placeholder"; $("thumbProg").textContent = "This link blocks previews, showing timecodes"; drawTimeline(); return; }
+    tmp[i] = c;
+    if (i % 8 === 7 || i === n-1){ $("thumbProg").textContent = i === n-1 ? "" : `Building film strip ${Math.round((i+1)/n*100)}%`; drawTimeline(); paintMomentThumbs();
+      if (i === n-1) $("report").querySelectorAll("canvas[data-th]").forEach(c => paintThumb(c.getContext("2d"), 280, 158, +c.dataset.th)); }
+  }
+}
+
+/* ---- timeline ---- */
+const tlScroll = $("tlScroll"), tlInner = $("tlInner"), tlCanvas = $("tlCanvas"), tlMain = $("tlMain");
+const X = t => G.pad + t * R.pps;
+function layoutTimeline(resetZoom){
+  $("tl").style.height = TLH + "px";
+  const labels = [["", Y.strip - G.ruler + 2, G.ruler], ["🎞️", Y.strip, G.strip, "film"], ["🔥", Y.eng, G.eng, "hype"],
+    ...LANES.map((k,i) => [EMO[k].icon, laneY(i), G.lane]), ["📱", Y.drift, G.lane]];
+  $("tlLabels").innerHTML = labels.map(([ic,y,h,sm]) => `<div style="top:${y}px;height:${h}px" title="${ic}">${ic}${sm?`<small>${sm}</small>`:""}</div>`).join("");
+  const w = tlMain.clientWidth;
+  R.fit = Math.max(.05, (w - G.pad*2) / R.D);
+  if (resetZoom){ $("zoom").value = 0; R.pps = R.fit; }
+  else applyZoom(+$("zoom").value, true);
+  sizeCanvas(); placeMarkers(); drawTimeline(); placePlayhead();
+}
+function sizeCanvas(){
+  const dpr = window.devicePixelRatio || 1, w = tlMain.clientWidth;
+  tlCanvas.width = Math.round(w*dpr); tlCanvas.height = Math.round(TLH*dpr); tlCanvas.style.width = w+"px"; tlCanvas.style.height = TLH+"px";
+  tlInner.style.width = (R.D * R.pps + G.pad*2) + "px";
+}
+function applyZoom(val, keep){
+  const maxPps = 24, center = R.t;
+  R.pps = R.fit * Math.pow(maxPps / R.fit, val/100);
+  if (R.pps < R.fit) R.pps = R.fit;
+  tlInner.style.width = (R.D * R.pps + G.pad*2) + "px";
+  if (!keep){ tlScroll.scrollLeft = X(center) - tlMain.clientWidth/2; }
+  placeMarkers(); drawTimeline(); placePlayhead();
+}
+$("zoom").addEventListener("input", e => applyZoom(+e.target.value));
+function placeMarkers(){
+  tlInner.querySelectorAll(".mk").forEach(el => el.remove());
+  const frag = document.createDocumentFragment(), lastX = {};
+  const ordered = [...R.moments].sort((a,b) => b.score - a.score);
+  const placed = [];
+  for (const m of ordered){
+    const lane = m.type === "fire" ? -1 : m.type === "remember" ? -2 : m.type === "drift" ? 99 : LANES.indexOf(m.type);
+    const y = lane === -1 ? Y.eng + 13 : lane === -2 ? Y.strip + 15 : lane === 99 ? Y.drift + G.lane/2 : laneY(lane) + G.lane/2;
+    const x = X(m.t);
+    if (placed.some(p => p.lane === lane && Math.abs(p.x - x) < 24)) continue;
+    placed.push({ lane, x });
+    const b = document.createElement("button");
+    b.className = "mk" + (m.type === "fire" ? " fire" : "") + (R.sel === m.i ? " on" : "");
+    b.style.left = x + "px"; b.style.top = y + "px"; b.dataset.m = m.i; b.textContent = EMO[m.type].icon;
+    b.setAttribute("aria-label", `${m.title} at ${fmt(m.t)}. ${m.detail}`); b.title = `${fmt(m.t)} · ${m.title} · ${m.detail}`;
+    frag.appendChild(b);
+  }
+  tlInner.appendChild(frag);
+}
+tlInner.addEventListener("click", e => { const b = e.target.closest(".mk"); if (b){ e.stopPropagation(); selectMoment(+b.dataset.m, false); } });
+function niceStep(){ const target = 90 / R.pps; return [1,2,5,10,15,30,60,120,300,600,900,1800,3600].find(s => s >= target) || 3600; }
+function rr(ctx, x, y, w, h, r){ ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h); }
+const thumbCache = new Map();
+function drawTimeline(){
+  if (!R.A) return;
+  const ctx = tlCanvas.getContext("2d"), dpr = window.devicePixelRatio || 1, w = tlMain.clientWidth, sl = tlScroll.scrollLeft, A = R.A, D = R.D;
+  ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,w,TLH);
+  const t0 = Math.max(0, (sl - G.pad)/R.pps), t1 = Math.min(D, (sl + w)/R.pps);
+  const px = t => X(t) - sl, x0 = px(0), xEnd = px(D);
+  // ruler
+  const step = niceStep(); ctx.font = "600 11px 'Bricolage Grotesque',system-ui,sans-serif"; ctx.textAlign = "left";
+  for (let t = Math.floor(t0/step)*step; t <= t1; t += step){
+    const x = px(t); ctx.fillStyle = "rgba(246,239,230,.35)"; ctx.fillRect(Math.round(x), 16, 1, 8); ctx.fillStyle = "#8B8492"; ctx.fillText(fmt(t), x + 4, 14);
+    for (let k=1;k<5;k++){ const xx = px(t + step*k/5); if (xx < xEnd) { ctx.fillStyle = "rgba(246,239,230,.14)"; ctx.fillRect(Math.round(xx), 20, 1, 4); } }
+  }
+  // film strip
+  const tw = Math.round(G.strip * 16/9);
+  ctx.save(); rr(ctx, x0, Y.strip, xEnd - x0, G.strip, 10); ctx.clip();
+  ctx.fillStyle = "#000"; ctx.fillRect(x0, Y.strip, xEnd - x0, G.strip);
+  const first = Math.floor((sl - x0 - G.pad) / tw);
+  for (let k = Math.max(0, first); ; k++){
+    const x = x0 + k*tw; if (x > w) break; if (x > xEnd) break;
+    const t = clamp((k*tw + tw/2) / R.pps, 0, D-1);
+    const key = R.thumbMode + "|" + Math.round(t) + "|" + (R.thumbs.length ? Math.floor(t/D*R.thumbs.length) + (R.thumbs[Math.floor(t/D*R.thumbs.length)] ? "y" : "n") : "");
+    let c = thumbCache.get(key);
+    if (!c){ c = document.createElement("canvas"); c.width = tw*2; c.height = G.strip*2; paintThumb(c.getContext("2d"), tw*2, G.strip*2, t); thumbCache.set(key, c); if (thumbCache.size > 600) thumbCache.delete(thumbCache.keys().next().value); }
+    ctx.drawImage(c, x, Y.strip, tw, G.strip);
+    ctx.fillStyle = "rgba(0,0,0,.35)"; ctx.fillRect(x + tw - 1, Y.strip, 1, G.strip);
+  }
+  ctx.restore();
+  ctx.strokeStyle = "rgba(255,255,255,.85)"; ctx.lineWidth = 2; rr(ctx, x0+1, Y.strip+1, xEnd-x0-2, G.strip-2, 10); ctx.stroke();
+  // engagement lane
+  const laneBg = (y, h) => { ctx.fillStyle = "#1E1B23"; rr(ctx, x0, y, xEnd - x0, h, 8); ctx.fill(); };
+  laneBg(Y.eng, G.eng);
+  A.lost.forEach(d => { ctx.fillStyle = "rgba(255,92,122,.12)"; ctx.fillRect(px(d.s), Y.eng, (d.e-d.s)*R.pps, TLH - Y.eng - 8); });
+  const lo = 30, hi = 100, ey = v => Y.eng + G.eng - 3 - clamp((v-lo)/(hi-lo), 0, 1) * (G.eng - 8);
+  const grad = ctx.createLinearGradient(0, Y.eng, 0, Y.eng + G.eng); grad.addColorStop(0, "rgba(255,77,46,.75)"); grad.addColorStop(.6, "rgba(255,122,69,.25)"); grad.addColorStop(1, "rgba(255,122,69,0)");
+  const sT = Math.max(0, Math.floor(t0)), eT = Math.min(D-1, Math.ceil(t1)), stepT = Math.max(1, Math.floor(1 / R.pps));
+  ctx.beginPath(); ctx.moveTo(px(sT), Y.eng + G.eng);
+  for (let t=sT; t<=eT; t+=stepT) ctx.lineTo(px(t+.5), ey(A.eng[t]));
+  ctx.lineTo(px(eT+1), Y.eng + G.eng); ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
+  ctx.beginPath(); for (let t=sT; t<=eT; t+=stepT){ const x = px(t+.5), y = ey(A.eng[t]); t===sT ? ctx.moveTo(x,y) : ctx.lineTo(x,y); }
+  ctx.strokeStyle = "#FF7A45"; ctx.lineWidth = 1.6; ctx.stroke();
+  ctx.setLineDash([3,4]); ctx.strokeStyle = "rgba(246,239,230,.35)"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(Math.max(x0,0), ey(A.avg)); ctx.lineTo(Math.min(xEnd,w), ey(A.avg)); ctx.stroke(); ctx.setLineDash([]);
+  // emotion lanes
+  LANES.forEach((k,i) => {
+    const y = laneY(i); laneBg(y, G.lane);
+    ctx.fillStyle = EMO[k].color; const sh = A.share[k];
+    for (let t=sT; t<=eT; t++){ const v = sh[t]; if (v < .05) continue; ctx.globalAlpha = clamp(v*2.2, .12, 1); ctx.fillRect(px(t), y + 4, Math.max(1, R.pps), G.lane - 8); }
+    ctx.globalAlpha = 1;
+  });
+  // drift lane
+  laneBg(Y.drift, G.lane);
+  ctx.fillStyle = "rgba(255,92,122,.55)";
+  for (let t=sT; t<=eT; t++){ const v = 1 - A.attn[t]; if (v < .12) continue; ctx.globalAlpha = clamp(v*1.6, .1, 1); ctx.fillRect(px(t), Y.drift + 4, Math.max(1, R.pps), G.lane - 8); }
+  ctx.globalAlpha = 1;
+}
+tlScroll.addEventListener("scroll", () => requestAnimationFrame(drawTimeline), { passive:true });
+let scrubbing = false;
+const timeAt = e => clamp((e.clientX - tlScroll.getBoundingClientRect().left + tlScroll.scrollLeft - G.pad) / R.pps, 0, R.D - .01);
+tlScroll.addEventListener("pointerdown", e => { if (e.target.closest(".mk") || e.pointerType === "touch") return; scrubbing = true; stopPlay(); setTime(timeAt(e)); tlScroll.setPointerCapture(e.pointerId); });
+tlScroll.addEventListener("pointermove", e => { if (scrubbing) setTime(timeAt(e)); });
+["pointerup","pointercancel"].forEach(ev => tlScroll.addEventListener(ev, () => scrubbing = false));
+tlScroll.addEventListener("click", e => { if (e.pointerType === "touch" || (e.pointerType === undefined && !e.target.closest(".mk"))) { if (!e.target.closest(".mk")) setTime(timeAt(e)); } });
+tlScroll.addEventListener("keydown", e => { if (e.key === "ArrowLeft" || e.key === "ArrowRight"){ e.preventDefault(); stopPlay(); setTime(R.t + (e.key === "ArrowLeft" ? -5 : 5), true); } });
+window.addEventListener("resize", () => { if (!$("v-results").hidden) { layoutTimeline(false); } });
+
+function placePlayhead(){ $("ph").style.left = X(R.t) + "px"; }
+function setTime(t, scroll){
+  R.t = clamp(t, 0, R.D - .01); placePlayhead();
+  $("rsTime").innerHTML = `${fmt(R.t)} <span>/ ${fmt(R.D)}</span>`; $("pvTc").textContent = fmt(R.t);
+  const pvV = $("pvVideo");
+  if (R.src && !R.playing && Math.abs(pvV.currentTime - R.t) > .3) { try { pvV.currentTime = R.t; } catch {} }
+  if (!R.src){ const c = $("pvCanvas"), cx = c.getContext("2d"); if (R.demo) drawFrame(cx, 960, 540, R.t); else drawPlaceholder(cx, 960, 540, R.t); }
+  const A = R.A, s = Math.floor(R.t), r = A.inRoom[s] || 0, chips = [`<span>🔥 ${Math.round(A.eng[s])} engagement</span>`];
+  for (const k of LANES){ const c = A.count[k][s]; if (c >= 2 && A.share[k][s] >= .15) chips.push(`<span>${EMO[k].icon} ${c} of ${r} ${EMO[k].verb}</span>`); }
+  const away = r - Math.round(A.attn[s]*r); if (away >= 2) chips.push(`<span>📱 ${away} looking away</span>`);
+  $("pvNow").innerHTML = chips.join("");
+  if (scroll || R.playing){ const x = X(R.t), w = tlMain.clientWidth, sl = tlScroll.scrollLeft;
+    if (scroll ? (x < sl + 40 || x > sl + w - 40) : x > sl + w*.8) tlScroll.scrollLeft = x - (scroll ? w/2 : w*.2); }
+}
+let playRaf = 0, lastFrame = 0;
+function startPlay(){
+  if (R.t >= R.D - 1) setTime(0);
+  R.playing = true; $("rsPlay").textContent = "❚❚"; $("rsPlay").setAttribute("aria-label","Pause");
+  const pvV = $("pvVideo"); if (R.src){ pvV.currentTime = R.t; pvV.play().catch(() => {}); }
+  lastFrame = performance.now();
+  const step = now => { playRaf = requestAnimationFrame(step);
+    const t = R.src ? pvV.currentTime : R.t + (now - lastFrame)/1000; lastFrame = now;
+    if (t >= R.D - .05){ setTime(R.D - .01); stopPlay(); return; } setTime(t); };
+  playRaf = requestAnimationFrame(step);
+}
+function stopPlay(){ cancelAnimationFrame(playRaf); R.playing = false; $("rsPlay").textContent = "▶"; $("rsPlay").setAttribute("aria-label","Play"); if (R.src) $("pvVideo").pause(); }
+$("rsPlay").onclick = () => R.playing ? stopPlay() : startPlay();
+document.addEventListener("keydown", e => {
+  if ($("v-results").hidden || /INPUT|SELECT|TEXTAREA/.test(document.activeElement?.tagName) && document.activeElement.type !== "range") return;
+  if (e.code === "Space"){ e.preventDefault(); R.playing ? stopPlay() : startPlay(); }
+});
+$("rsBack").onclick = () => { stopPlay(); R.thumbToken = 0; if (W.earn && !R.demo) showHome(); else show("v-studio"); };
+$("rsImport").onchange = async e => {
+  const { out, bad } = await readSessionFiles([...e.target.files]); e.target.value = "";
+  if (bad.length) toast(`Couldn't read ${bad.length} file${bad.length>1?"s":""}`);
+  if (!out.length) return;
+  if (R.demo){ toast("Added to your own screening, not the sample"); S.sessions.push(...out); return; }
+  S.sessions.push(...out); openResults(false); toast(`Added ${out.length} viewer${out.length>1?"s":""}`);
+};
+$("rsExport").onclick = () => {
+  const rows = [["timecode","seconds","type","moment","detail"]].concat(R.moments.map(m => [fmt(m.t), m.t, EMO[m.type].name, m.title, m.detail]));
+  download(`${safe(R.title)}__markers.csv`, rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n"), "text/csv");
+};
+
+/* ============================================================
+   boot
+   ============================================================ */
+function boot(){
+  const m = location.hash.match(/^#i=(.+)$/);
+  if (m){
+    try { const inv = JSON.parse(unb64(m[1])); if (!inv.t || !inv.n) throw 0; startViewer(inv, inv.s || ""); }
+    catch { $("badTitle").textContent = "this link isn't working"; $("badText").textContent = "It may have been cut off when it was copied. Ask the host to send it again."; show("v-bad"); }
+    return;
+  }
+  if (location.hash === "#studio") show("v-studio"); else showHome();
+  if (params.get("sample") === "1" || location.hash === "#sample") openResults(true);
+}
+boot();
+</script>
+</body>
+</html>
