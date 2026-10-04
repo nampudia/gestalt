@@ -13,30 +13,7 @@ PORT = int(os.environ.get("PORT", 8000))
 MODEL = os.environ.get("SCREENTEST_MODEL", "claude-sonnet-5-5")
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-NOTES_PROMPT = """You are a sharp story editor and audience-research lead sitting in on a film test screening. Below is the data:
-an auto-detected scene list (each scene named and described from its frames and dialogue), per-scene engagement (0-100) and the
-peak share of the room showing each reaction, key moments, stretches where the audience drifted, walkouts, survey answers and
-audience-group breakdowns.
-
-Your job is to give the filmmakers ideas they can try, not to restate the data.
-
-Write 4 to 6 notes, most valuable first. Each note has:
-- "observation": what the audience did, with the specific numbers and timestamp. One or two sentences, under 35 words.
-- "suggestion": a concrete creative move to try in the edit, sound, music, story or marketing. Be specific and imaginative:
-  "trim the 6 seconds of the llama staring before the fence jump", "hold on the penguin's reaction for an extra beat",
-  "add a sound sting as the cart drops", "cut a 15-second vertical clip from 1:04 to 1:19 ending on the crash".
-  Use what the scene descriptions tell you about the picture. Give one main idea, optionally a second alternative. Under 45 words.
-
-Rules:
-- Every note covers a DIFFERENT scene or a different problem. Never repeat a point.
-- Do NOT mention sample size, confidence or "directional" inside any note. Put that once, in "caveat", and nowhere else.
-- Skip anything the data can't speak to. No notes that only say something is unknown or untested.
-- Refer to scenes by name and times as m:ss (e.g. 10:42), never raw seconds. Never invent numbers.
-- Strongest note first. Mix edit notes with at least one marketing note when there are reactions to work with.
-Reply with ONLY a JSON object, no prose:
-{"caveat": "one short sentence on how much weight the data can bear, or an empty string if the sample is solid",
- "notes": [{"area": "Edit" | "Sound & music" | "Story" | "Marketing" | "Release", "priority": 1 | 2 | 3, "title": "a short headline that states the idea",
- "observation": "...", "suggestion": "...", "evidence": [{"t": seconds, "label": "short label"}], "confidence": "low" | "medium" | "high"}]}"""
+NOTES_PROMPT = open("notes_prompt.txt", encoding="utf-8").read()
 
 
 def ask_claude(payload):

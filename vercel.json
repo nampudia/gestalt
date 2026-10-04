@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "api/notes.js": { "maxDuration": 60, "includeFiles": "notes_prompt.txt" }
+  },
+  "headers": [
+    { "source": "/(.*)\\.mp4", "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }] }
+  ]
+}

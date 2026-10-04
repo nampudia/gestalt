@@ -1471,10 +1471,11 @@ function sceneStats(){
 }
 
 /* ---- audience notes (rules now, Claude when a key is set) ---- */
-let claudeOK = null;
+let claudeOK = null, needPass = false;
+const passStore = { get(){ try { return localStorage.getItem("screentest.pass") || ""; } catch { return ""; } }, set(v){ try { v ? localStorage.setItem("screentest.pass", v) : localStorage.removeItem("screentest.pass"); } catch {} } };
 async function checkClaude(){
   if (claudeOK !== null) return;
-  try { const r = await fetch("/api/status"); const j = await r.json(); claudeOK = !!j.claude; R.claudeModel = j.model; } catch { claudeOK = false; }
+  try { const r = await fetch("/api/status"); const j = await r.json(); claudeOK = !!j.claude; R.claudeModel = j.model; needPass = !!j.pass; } catch { claudeOK = false; }
   if (!$("v-results").hidden) renderReport();
 }
 const pct = v => Math.round(v*100) + "%";
@@ -1543,8 +1544,8 @@ function claudePayload(){
 async function askClaude(){
   if (R.notesBusy) return; R.notesBusy = true; renderReport();
   try {
-    const r = await fetch("/api/notes", { method:"POST", headers:{ "Content-Type":"application/json" }, body:JSON.stringify(claudePayload()) });
-    const j = await r.json(); if (!r.ok || !Array.isArray(j.notes)) throw new Error(j.error || "No notes came back");
+    const r = await fetch("/api/notes", { method:"POST", headers:{ "Content-Type":"application/json", "x-screentest-pass": passStore.get() }, body:JSON.stringify(claudePayload()) });
+    const j = await r.json(); if (r.status === 401) passStore.set(""); if (!r.ok || !Array.isArray(j.notes)) throw new Error(j.error || "No notes came back");
     R.aiNotes[R.seg] = j.notes.filter(n => n && n.title).map(n => ({ area:String(n.area||"Edit"), p:clamp(+n.priority||2,1,3), conf:["low","medium","high"].includes(n.confidence) ? n.confidence : "medium",
       title:String(n.title), body:String(n.observation||n.body||""), tryit:String(n.suggestion||""), ev:(Array.isArray(n.evidence) ? n.evidence : []).filter(e => isFinite(+e.t)).slice(0,5).map(e => ({ t:clamp(+e.t,0,R.D-1), l:`${fmt(+e.t)} ${String(e.label||"").slice(0,40)}` })) }))
       .sort((a,b) => a.p - b.p);
@@ -1555,7 +1556,9 @@ async function askClaude(){
 function notesCard(){
   const ai = R.aiNotes?.[R.seg], notes = ai || ruleNotes();
   const src = ai ? `<span class="badge ai">✨ Written by Claude${R.claudeModel ? " · " + esc(R.claudeModel) : ""}</span>` : `<span class="badge">Smart rules</span>`;
-  const btn = claudeOK ? `<button class="ask" id="askClaude" ${R.notesBusy ? "disabled" : ""}>${ai ? "✨ Rewrite with Claude" : "✨ Ask Claude for deeper notes"}</button>`
+  const btn = claudeOK && needPass && !passStore.get()
+      ? `<form id="passForm" style="display:flex; gap:6px; align-items:center"><label for="passIn" class="askhint" style="max-width:none">Studio passcode</label><input id="passIn" type="password" autocomplete="off" style="width:130px; padding:8px 10px; border-radius:10px; border:2px solid var(--line2); background:var(--panel2)"><button class="ask" type="submit">✨ Unlock</button></form>`
+    : claudeOK ? `<button class="ask" id="askClaude" ${R.notesBusy ? "disabled" : ""}>${ai ? "✨ Rewrite with Claude" : "✨ Ask Claude for deeper notes"}</button>`
     : location.protocol === "file:"
       ? `<span class="askhint">This page was opened as a file, so Claude can't reach it. Run serve.py, then open localhost:8000/app.html.</span>`
       : `<span class="askhint">Deeper notes from Claude unlock when you run serve.py with your API key set.</span>`;
@@ -1663,6 +1666,10 @@ function renderReport(){
   $("report").innerHTML = cards.join("");
   $("report").querySelectorAll("canvas[data-th]").forEach(c => paintThumb(c.getContext("2d"), 280, 158, +c.dataset.th));
 }
+$("report").addEventListener("submit", e => {
+  if (e.target.id !== "passForm") return; e.preventDefault();
+  const v = $("passIn").value.trim(); if (!v) return; passStore.set(v); renderReport(); askClaude();
+});
 $("report").onclick = e => {
   if (e.target.closest("#askClaude")){ askClaude(); return; }
   const r = e.target.closest("tr[data-seg]"); if (r){ setSegment(r.dataset.seg); window.scrollTo({ top:0, behavior:"smooth" }); return; }

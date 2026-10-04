@@ -75,3 +75,12 @@ MediaPipe Face Landmarker runs in the viewer's browser. No video leaves the devi
 ## Credits
 
 Sample films: *Caminandes 3: Llamigos* and *Caminandes 2: Gran Dillama* © Blender Foundation, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
+
+## Deploy (Vercel + your domain)
+
+1. Import this repo at vercel.com/new (Framework preset: Other, no build command).
+2. Settings → Environment Variables:
+   - `ANTHROPIC_API_KEY`: your Claude API key
+   - `NOTES_PASSCODE` (recommended): a passcode studios type to unlock Claude notes, so strangers can't spend your credits
+3. Redeploy. `api/notes.js` and `api/status.js` replace `serve.py` in production.
+4. Settings → Domains → add your domain, then copy the DNS records Vercel shows into your registrar.
