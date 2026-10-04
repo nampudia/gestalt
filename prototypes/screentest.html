@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Screentest: audience timeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E7ECEA; --surface:#F6F8F6; --ink:#172226; --muted:#56666A; --rule:#C6D0CC;
+  --attn:#0B6E6E; --sync:#A8660A; --react:#A8376B; --lost:rgba(168,55,107,.13);
+  --away:rgba(23,34,38,.13);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#151B1E; --surface:#1D2529; --ink:#E6ECEA; --muted:#8FA0A3; --rule:#303C41;
+    --attn:#4CC2BD; --sync:#E9A93C; --react:#E77BA8; --lost:rgba(231,123,168,.16);
+    --away:rgba(230,236,234,.13);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#151B1E; --surface:#1D2529; --ink:#E6ECEA; --muted:#8FA0A3; --rule:#303C41;
+  --attn:#4CC2BD; --sync:#E9A93C; --react:#E77BA8; --lost:rgba(231,123,168,.16);
+  --away:rgba(230,236,234,.13);
+}
+*,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none!important}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Archivo","Helvetica Neue",Arial,sans-serif;
+  font-size:16px; line-height:1.5; font-variant-numeric:tabular-nums;
+}
+.narrow{font-stretch:68%; font-family:"Archivo","Arial Narrow","Helvetica Neue",Arial,sans-serif}
+.wrap{max-width:1240px; margin:0 auto; padding:20px clamp(16px,3vw,36px) 56px}
+button,input,select{font:inherit; color:inherit}
+:focus-visible{outline:2px solid var(--attn); outline-offset:2px}
+
+/* header */
+.top{display:flex; flex-wrap:wrap; gap:12px 24px; align-items:baseline; justify-content:space-between}
+.mark{font-weight:800; font-stretch:125%; letter-spacing:.01em; font-size:15px}
+.actions{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+.btn{
+  display:inline-block; padding:7px 14px; border:1.5px solid var(--ink); border-radius:3px;
+  background:transparent; cursor:pointer; font-weight:600; font-size:14px;
+}
+.btn:hover{background:var(--ink); color:var(--bg)}
+.btn.quiet{border-color:var(--rule); font-weight:500}
+.btn.quiet:hover{background:var(--rule); color:var(--ink)}
+.file-btn input{position:absolute; opacity:0; width:1px; height:1px}
+.file-btn:focus-within{outline:2px solid var(--attn); outline-offset:2px}
+
+h1{
+  margin:28px 0 4px; font-size:clamp(30px,5vw,52px); line-height:1.02;
+  font-weight:800; font-stretch:68%; letter-spacing:-.005em;
+}
+.meta{margin:0; color:var(--muted); font-size:15px}
+.meta strong{color:var(--ink); font-weight:600}
+
+.verdict{
+  margin:22px 0 26px; max-width:62ch; font-size:clamp(18px,2.1vw,22px); line-height:1.42;
+}
+.verdict b{font-weight:800; font-stretch:68%; font-size:1.18em; letter-spacing:.005em}
+
+.msg{margin:0 0 16px; padding:10px 14px; border-left:3px solid var(--react); background:var(--surface); font-size:14.5px; white-space:pre-line}
+.msg[hidden]{display:none}
+
+/* timeline */
+.tl-card{background:var(--surface); border:1px solid var(--rule); border-radius:4px}
+.readout{
+  display:flex; flex-wrap:wrap; gap:4px 22px; padding:10px 14px; border-bottom:1px solid var(--rule);
+  font-size:14.5px; min-height:44px; align-items:baseline;
+}
+.readout .t{font-weight:800; font-stretch:68%; font-size:20px; min-width:4.2em}
+.readout span b{font-weight:700}
+.readout .hint{color:var(--muted)}
+.tl-scroll{overflow-x:auto; outline-offset:-2px}
+.tl-inner{position:relative; min-width:780px; cursor:crosshair; touch-action:pan-x pan-y}
+.tl-inner svg{display:block}
+.tl-inner canvas{display:block}
+.cursor-line,.hover-line{position:absolute; top:0; bottom:0; width:0; border-left:1.5px solid var(--ink); pointer-events:none}
+.hover-line{border-left:1px dashed var(--muted)}
+.cursor-line[hidden],.hover-line[hidden]{display:none}
+
+.lbl{font-size:12.5px; fill:var(--ink); font-weight:600}
+.sub{font-size:11.5px; fill:var(--muted)}
+.tick{font-size:11.5px; fill:var(--muted); font-stretch:68%}
+.grid-line{stroke:var(--rule); stroke-width:1}
+.attn-area{fill:var(--attn); fill-opacity:.2}
+.attn-line{fill:none; stroke:var(--attn); stroke-width:1.8}
+.avg-line{stroke:var(--attn); stroke-width:1; stroke-dasharray:4 4}
+.sync-area{fill:var(--sync); fill-opacity:.18}
+.sync-line{fill:none; stroke:var(--sync); stroke-width:1.8}
+.smile-bar{fill:var(--react)}
+.startle{stroke:var(--ink); stroke-width:1.4}
+.startle-dot{fill:var(--ink)}
+.lost-band{fill:var(--lost)}
+.beat{cursor:pointer}
+.beat path{stroke:var(--ink); stroke-width:1.6}
+.beat.landed path{fill:var(--ink)}
+.beat.partial path{fill:url(#half)}
+.beat.missed path{fill:var(--surface)}
+.beat-stem{stroke:var(--ink); stroke-width:1; stroke-opacity:.35}
+
+.legend{display:flex; flex-wrap:wrap; gap:6px 20px; padding:10px 14px; border-top:1px solid var(--rule); font-size:13px; color:var(--muted)}
+.legend svg{vertical-align:-3px; margin-right:5px}
+.legend .k{white-space:nowrap}
+.legend path{stroke:var(--ink); stroke-width:1.6}
+
+/* lower panels */
+.cols{display:grid; grid-template-columns:minmax(0,5fr) minmax(0,7fr); gap:36px; margin-top:40px}
+@media (max-width:900px){.cols{grid-template-columns:minmax(0,1fr)}}
+h2{margin:0 0 4px; font-size:24px; font-weight:800; font-stretch:68%; line-height:1.15}
+.note{margin:0 0 14px; color:var(--muted); font-size:14.5px; max-width:60ch}
+
+.lost-list{list-style:none; margin:0; padding:0}
+.lost-list li{border-top:1px solid var(--rule)}
+.lost-list li:last-child{border-bottom:1px solid var(--rule)}
+.lost-item{display:block; width:100%; text-align:left; background:none; border:0; padding:12px 0; cursor:pointer}
+.lost-item:hover .range{text-decoration:underline; text-underline-offset:3px}
+.lost-item .range{font-weight:800; font-stretch:68%; font-size:21px}
+.lost-item .detail{display:block; font-size:14.5px; color:var(--muted)}
+.lost-item .detail b{color:var(--ink); font-weight:600}
+.empty{padding:14px 0; color:var(--muted); font-size:14.5px; border-top:1px solid var(--rule); border-bottom:1px solid var(--rule)}
+
+.beat-scroll{overflow-x:auto}
+table{border-collapse:collapse; width:100%; font-size:14.5px; min-width:460px}
+th{font-weight:500; color:var(--muted); text-align:left; font-size:13px; padding:6px 10px 6px 0; border-bottom:1px solid var(--rule)}
+td{padding:8px 10px 8px 0; border-bottom:1px solid var(--rule); vertical-align:middle}
+td.tc{font-weight:800; font-stretch:68%; font-size:17px; white-space:nowrap}
+td.tc button{background:none; border:0; padding:0; cursor:pointer; font-weight:inherit; font-stretch:inherit}
+td.tc button:hover{text-decoration:underline; text-underline-offset:3px}
+td.pct{white-space:nowrap}
+.bar{display:inline-block; width:64px; height:8px; border:1px solid var(--ink); vertical-align:middle; margin-right:8px; position:relative}
+.bar i{position:absolute; left:0; top:0; bottom:0; background:var(--ink)}
+.status{font-weight:600}
+.rm{background:none; border:0; color:var(--muted); cursor:pointer; padding:2px 4px; font-size:13px; text-decoration:underline; text-underline-offset:3px}
+.rm:hover{color:var(--ink)}
+td svg path{stroke:var(--ink); stroke-width:1.6}
+
+.add{display:grid; grid-template-columns:92px 120px minmax(0,1fr) auto; gap:8px; margin-top:14px; align-items:end}
+@media (max-width:560px){.add{grid-template-columns:1fr 1fr}}
+.add label{display:block; font-size:13px; color:var(--muted)}
+.add input,.add select{
+  width:100%; margin-top:3px; padding:7px 9px; background:var(--bg); border:1px solid var(--rule); border-radius:3px;
+}
+.add .err{grid-column:1/-1; color:var(--react); font-size:13.5px; min-height:1.2em; margin:0}
+
+details{margin-top:44px; border-top:1px solid var(--rule); padding-top:14px}
+summary{cursor:pointer; font-weight:600}
+details p{max-width:70ch; font-size:15px}
+pre{
+  overflow-x:auto; background:var(--surface); border:1px solid var(--rule); border-radius:4px;
+  padding:14px; font-size:13px; line-height:1.5; font-family:ui-monospace,Menlo,Consolas,monospace;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div class="mark">Screentest</div>
+    <div class="actions">
+      <label class="btn file-btn">Load session files<input id="files" type="file" accept=".json,application/json" multiple></label>
+      <button class="btn quiet" id="showDemo" hidden>Show demo screening</button>
+    </div>
+  </div>
+
+  <h1 id="title"></h1>
+  <p class="meta" id="meta"></p>
+
+  <p class="verdict" id="verdict"></p>
+  <p class="msg" id="msg" hidden></p>
+
+  <section class="tl-card" aria-label="Audience timeline">
+    <div class="readout" id="readout" aria-live="polite"></div>
+    <div class="tl-scroll" id="tlScroll" tabindex="0" role="group"
+         aria-label="Timeline. Left and right arrows move the playhead 10 seconds, with shift 1 minute.">
+      <div class="tl-inner" id="tlInner">
+        <div id="svgHost"></div>
+        <canvas id="grid"></canvas>
+        <div class="hover-line" id="hoverLine" hidden></div>
+        <div class="cursor-line" id="cursorLine" hidden></div>
+      </div>
+    </div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <div class="cols">
+    <section>
+      <h2>Where you lost them</h2>
+      <p class="note">Stretches where the share of people watching the screen stayed well under this film's own average for a minute or more, worst first.</p>
+      <ul class="lost-list" id="lostList"></ul>
+    </section>
+
+    <section>
+      <h2>Did the beats land?</h2>
+      <p class="note">Tag the moments where you expect a reaction. A beat lands when at least half the people in the room react within a few seconds.</p>
+      <div class="beat-scroll"><table id="beatTable"></table></div>
+      <div class="add">
+        <label>Timecode<input id="bTime" inputmode="numeric" placeholder="41:20" autocomplete="off"></label>
+        <label>Expect<select id="bType">
+          <option value="laugh">Laugh</option>
+          <option value="scare">Scare</option>
+          <option value="hold">Hold (tension)</option>
+        </select></label>
+        <label>Label<input id="bLabel" placeholder="Diner confession" autocomplete="off"></label>
+        <button class="btn" id="bAdd">Add beat</button>
+        <p class="err" id="bErr" role="alert"></p>
+      </div>
+      <p style="margin-top:6px"><button class="rm" id="resetBeats" hidden>Reset to demo beats</button></p>
+    </section>
+  </div>
+
+  <details>
+    <summary>Session file format and how the numbers are computed</summary>
+    <p>Load one JSON file per viewer. Each file is a set of once-per-second arrays that start when the film starts. The capture script that ships with this dashboard writes this format and never saves video.</p>
+<pre>{
+  "viewer_id": "v07",
+  "film": "Landlord, cut 3",
+  "dt": 1,
+  "face":      [1, 1, 1, 0, ...],   // 1 when a face was found in frame
+  "attention": [1, 1, 0, 0, ...],   // 1 when the head is turned toward the screen
+  "motion":    [0.04, 0.05, ...],   // head movement, relative to face size
+  "smile":     [0.02, 0.61, ...]    // 0 to 1, relative to the viewer's resting face
+}</pre>
+    <p><strong>Watching</strong> is the share of people in the room whose head is toward the screen. <strong>In the room</strong> is the share of viewers whose face is still being found. <strong>In sync</strong> takes each viewer's combined smile and movement signal over a rolling minute and correlates it with everyone else's: near 0 means people are reacting on their own, higher means the film is driving them together. <strong>Laugh</strong> beats count a smile above 0.5 within 5 seconds, <strong>scare</strong> beats count a movement spike three deviations above that viewer's norm within 3 seconds, and <strong>hold</strong> beats count eyes on screen with unusually little movement for the next 20 seconds.</p>
+  </details>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- helpers ---------- */
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function clamp(v,a,b){return v<a?a:v>b?b:v}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+var LONG=false;
+function tc(s){
+  s=Math.max(0,Math.round(s));
+  var ss=s%60;
+  if(LONG){var h=Math.floor(s/3600), m=Math.floor(s%3600/60); return h+":"+String(m).padStart(2,"0")+":"+String(ss).padStart(2,"0")}
+  return Math.floor(s/60)+":"+String(ss).padStart(2,"0");
+}
+function parseTc(str){
+  str=String(str).trim(); if(!str) return null;
+  if(!/^\d+(:\d{1,2}){0,2}$/.test(str)) return null;
+  var p=str.split(":").map(Number), s=0;
+  for(var i=0;i<p.length;i++) s=s*60+p[i];
+  return s;
+}
+function pct(v){return Math.round(v*100)+"%"}
+function shapePath(type,cx,cy,r){
+  if(type==="scare") return "M"+cx+" "+(cy-r)+"L"+(cx+r)+" "+(cy+r*.85)+"L"+(cx-r)+" "+(cy+r*.85)+"Z";
+  if(type==="hold"){var q=r*.88;return "M"+(cx-q)+" "+(cy-q)+"h"+(2*q)+"v"+(2*q)+"h"+(-2*q)+"Z"}
+  return "M"+(cx-r)+" "+cy+"a"+r+" "+r+" 0 1 0 "+(2*r)+" 0a"+r+" "+r+" 0 1 0 "+(-2*r)+" 0Z";
+}
+var TYPE_NAME={laugh:"Laugh",scare:"Scare",hold:"Hold"};
+var STATUS_NAME={landed:"Landed",partial:"Partial",missed:"Missed",none:"No one in the room"};
+
+/* ---------- demo data ---------- */
+var DEMO_BEATS=[
+  [220,"laugh","Cold open gag",.82],[555,"hold","Interrogation standoff",.85],[890,"scare","Basement door",.76],
+  [1350,"laugh","Wrong funeral",.7],[1745,"hold","Rooftop phone call",.72],[2300,"laugh","Landlord runner, second time",.2],
+  [2590,"hold","Diner confession",.3],[2865,"laugh","Karaoke bit",.14],[3330,"scare","Car window",.66],
+  [3670,"laugh","Landlord payoff",.42],[4180,"hold","Hospital corridor",.34],[4580,"scare","Lights out",.82],
+  [5040,"hold","Final standoff",.9],[5430,"laugh","Last line",.74]
+];
+function buildDemo(){
+  var R=rng(20260920), D=94*60, N=24;
+  function gauss(){return Math.sqrt(-2*Math.log(1-R()))*Math.cos(6.283185*R())}
+  function bump(t,a,b,e){ if(t<=a-e||t>=b+e) return 0; if(t<a) return .5-.5*Math.cos(Math.PI*(t-a+e)/e); if(t>b) return .5+.5*Math.cos(Math.PI*(t-b)/e); return 1 }
+  var E=new Float32Array(D);
+  for(var t=0;t<D;t++) E[t]=clamp(.87-.36*bump(t,2190,3040,170)-.17*bump(t,4030,4370,110)+.07*bump(t,4700,5400,150),.2,.97);
+  // micro events the whole room may react to
+  var micro=[]; for(var s=20;s<D-10;s+=15+Math.floor(R()*20)) micro.push({t:s,kind:R()<.3?"smile":"motion",str:.2+R()*.2});
+  var leaves={5:2650,13:2855,19:4250};
+  var viewers=[];
+  for(var v=0;v<N;v++){
+    var a=.86+R()*.24, L=leaves[v]||Infinity;
+    var face=new Uint8Array(D), att=new Uint8Array(D), mot=new Float32Array(D), smi=new Float32Array(D);
+    var holdUntil=-1, holdResp={};
+    DEMO_BEATS.forEach(function(b){ if(b[1]==="hold"&&R()<b[3]*clamp(a,.9,1.05)) holdResp[b[0]]=1 });
+    var away=false;
+    for(t=0;t<D;t++){
+      if(t>=L) break;
+      if(holdResp[t]) holdUntil=t+26;
+      var inHold=t<=holdUntil, q=1-Math.min(1,E[t]*a);
+      if(inHold) away=false;
+      else if(!away){ if(R()<.004+.22*q*q){away=true; mot[t]+=.3+R()*.3} }
+      else if(R()<Math.max(.03,.16-.2*q)){away=false; mot[t]+=.25+R()*.3}
+      var f=away?(R()<.7?1:0):(R()<.992?1:0);
+      face[t]=f; att[t]=(f&&!away)?1:0;
+      if(f){
+        mot[t]+=Math.abs(gauss())*.05*(inHold?.35:(1+3*q));
+        smi[t]+=Math.max(0,.04+gauss()*.03);
+      }
+    }
+    function add(arr,t0,amp,shape){ for(var k=0;k<shape.length;k++){ var tt=t0+k; if(tt<D&&tt<L&&face[tt]) arr[tt]=Math.min(1.2,arr[tt]+amp*shape[k]) } }
+    micro.forEach(function(m){
+      if(m.t>=L||!att[m.t]||m.t<=holdUntilFor(m.t)) return;
+      if(R()<.78*E[m.t]*a) add(m.kind==="smile"?smi:mot,m.t+(R()<.5?0:1),m.str*(.6+R()*.4),[1,.7,.4,.15]);
+    });
+    function holdUntilFor(tt){ for(var k in holdResp){ if(tt>=+k&&tt<=+k+26) return tt } return -1 }
+    DEMO_BEATS.forEach(function(b){
+      if(b[0]>=L||!att[b[0]]) return;
+      if(b[1]==="laugh"&&R()<b[3]*a) add(smi,b[0]+1+(R()<.5?0:1),.7+R()*.3,[.8,1,1,.8,.5,.25]);
+      if(b[1]==="scare"&&R()<b[3]*a) add(mot,b[0]+(R()<.6?0:1),.85+R()*.3,[1,.5,.2]);
+    });
+    for(t=0;t<D;t++){ if(smi[t]>1) smi[t]=1 }
+    viewers.push({id:"v"+String(v+1).padStart(2,"0"),face:face,attention:att,motion:mot,smile:smi});
+  }
+  return {title:"Landlord, cut 3",duration:D,viewers:viewers,demo:true,
+          beats:DEMO_BEATS.map(function(b){return{t:b[0],type:b[1],label:b[2]}})};
+}
+
+/* ---------- analysis ---------- */
+var BIN=10;
+function derive(data,beats){
+  var V=data.viewers,N=V.length,D=data.duration,nb=Math.ceil(D/BIN),t,v,b;
+  var present=new Uint16Array(D),attending=new Uint16Array(D),smiling=new Uint16Array(D),startled=new Uint16Array(D);
+  var stats=V.map(function(w){
+    var ms=[],ss=[],last=-1;
+    for(var i=0;i<D;i++) if(w.face[i]){ms.push(w.motion[i]);ss.push(w.smile[i]);last=i}
+    function mean(a){var s=0;for(var i=0;i<a.length;i++)s+=a[i];return a.length?s/a.length:0}
+    function sd(a,m){var s=0;for(var i=0;i<a.length;i++)s+=(a[i]-m)*(a[i]-m);return a.length>1?Math.sqrt(s/(a.length-1)):1}
+    var mm=mean(ms),msd=sd(ms,mm)||1,sm=mean(ss),ssd=sd(ss,sm)||1;
+    var sorted=ms.slice().sort(function(x,y){return x-y});
+    return{mMean:mm,mSd:msd,sMean:sm,sSd:ssd,mMed:sorted.length?sorted[sorted.length>>1]:0,last:last};
+  });
+  var comp=V.map(function(w,i){
+    var c=new Float32Array(D),st=stats[i];
+    for(var k=0;k<D;k++) if(w.face[k]) c[k]=(w.smile[k]-st.sMean)/st.sSd+(w.motion[k]-st.mMean)/st.mSd;
+    return c;
+  });
+  for(v=0;v<N;v++){var w=V[v],st=stats[v];
+    for(t=0;t<D;t++){ if(!w.face[t])continue; present[t]++; if(w.attention[t])attending[t]++;
+      if(w.smile[t]>.5)smiling[t]++; if(w.motion[t]>st.mMean+3*st.mSd)startled[t]++ } }
+  var attnBin=[],roomBin=[],smileBin=[],startleBin=[],syncBin=[],sumA=0,sumP=0;
+  for(b=0;b<nb;b++){
+    var a=0,p=0,sMax=0,stMax=0,t0=b*BIN,t1=Math.min(D,t0+BIN);
+    for(t=t0;t<t1;t++){a+=attending[t];p+=present[t]; if(present[t]){sMax=Math.max(sMax,smiling[t]/present[t]);stMax=Math.max(stMax,startled[t]/present[t])}}
+    sumA+=a;sumP+=p;
+    attnBin.push(p?a/p:null); roomBin.push(stats.filter(function(q){return q.last>=t0}).length); smileBin.push(sMax); startleBin.push(stMax);
+    // synchrony: each viewer against the mean of the others, 60 s window
+    var w0=Math.max(0,t0+BIN/2-30),w1=Math.min(D,w0+60),len=w1-w0,inc=[];
+    for(v=0;v<N;v++){var fc=0;for(t=w0;t<w1;t++)fc+=V[v].face[t]; if(fc>=len*.8)inc.push(v)}
+    if(inc.length<3||len<20){syncBin.push(null);continue}
+    var sum=new Float32Array(len); inc.forEach(function(iv){var c=comp[iv];for(var k=0;k<len;k++)sum[k]+=c[w0+k]});
+    var rs=0,rn=0;
+    inc.forEach(function(iv){var c=comp[iv],n1=inc.length-1,sx=0,sy=0,sxx=0,syy=0,sxy=0;
+      for(var k=0;k<len;k++){var x=c[w0+k],y=(sum[k]-x)/n1;sx+=x;sy+=y;sxx+=x*x;syy+=y*y;sxy+=x*y}
+      var den=Math.sqrt((sxx-sx*sx/len)*(syy-sy*sy/len)); if(den>1e-9){rs+=(sxy-sx*sy/len)/den;rn++}});
+    syncBin.push(rn?Math.max(0,rs/rn):null);
+  }
+  var avgAttn=sumP?sumA/sumP:0;
+  var sv=syncBin.filter(function(x){return x!==null}),avgSync=sv.length?sv.reduce(function(x,y){return x+y},0)/sv.length:0;
+  var walkouts=[];stats.forEach(function(s,i){ if(s.last>=0&&s.last<D-300) walkouts.push({id:V[i].id,t:s.last}) });
+  walkouts.sort(function(x,y){return x.t-y.t});
+
+  var beatRes=beats.map(function(bt){
+    var elig=0,hit=0;
+    V.forEach(function(w,i){
+      var st=stats[i],f=0,k,e=Math.min(D,bt.t+5); for(k=bt.t;k<e;k++)f+=w.face[k];
+      if(e<=bt.t||f<(e-bt.t)*.5) return; elig++;
+      var ok=false;
+      if(bt.type==="laugh"){for(k=bt.t;k<Math.min(D,bt.t+6);k++) if(w.face[k]&&w.smile[k]>.5){ok=true;break}}
+      else if(bt.type==="scare"){for(k=bt.t;k<Math.min(D,bt.t+4);k++) if(w.face[k]&&w.motion[k]>st.mMean+3*st.mSd){ok=true;break}}
+      else{var e2=Math.min(D,bt.t+20),at=0,mo=0,n=e2-bt.t; for(k=bt.t;k<e2;k++){at+=w.attention[k];mo+=w.motion[k]} ok=n>0&&at/n>=.9&&mo/n<.6*st.mMed}
+      if(ok)hit++;
+    });
+    var r=elig?hit/elig:null;
+    return{t:bt.t,type:bt.type,label:bt.label,elig:elig,hit:hit,rate:r,status:r===null?"none":r>=.5?"landed":r>=.25?"partial":"missed"};
+  });
+
+  // lost stretches
+  var sm=attnBin.map(function(_,i){var s=0,n=0;for(var k=i-3;k<=i+3;k++) if(k>=0&&k<nb&&attnBin[k]!==null){s+=attnBin[k];n++} return n?s/n:null});
+  var thr=avgAttn-.08,runs=[],cur=null;
+  for(b=0;b<nb;b++){
+    var low=sm[b]!==null&&sm[b]<thr;
+    if(low){ if(cur&&b-cur.e<=3)cur.e=b; else{ if(cur)runs.push(cur); cur={s:b,e:b} } }
+  }
+  if(cur)runs.push(cur);
+  var lost=runs.filter(function(r){return r.e-r.s+1>=6}).map(function(r){
+    var s=0,n=0,sev=0;for(var k=r.s;k<=r.e;k++) if(attnBin[k]!==null){s+=attnBin[k];n++;sev+=Math.max(0,avgAttn-attnBin[k])*BIN}
+    var t0=r.s*BIN,t1=Math.min(D,(r.e+1)*BIN);
+    return{start:t0,end:t1,attn:n?s/n:0,sev:sev,
+      walk:walkouts.filter(function(w){return w.t>=t0&&w.t<=t1}).length,
+      missed:beatRes.filter(function(x){return x.t>=t0&&x.t<=t1&&x.status==="missed"})};
+  }).sort(function(x,y){return y.sev-x.sev}).slice(0,4);
+
+  return{N:N,D:D,nb:nb,present:present,attending:attending,attnBin:attnBin,roomBin:roomBin,smileBin:smileBin,
+    startleBin:startleBin,syncBin:syncBin,last:stats.map(function(q){return q.last}),avgAttn:avgAttn,avgSync:avgSync,walkouts:walkouts,beatRes:beatRes,lost:lost,
+    smiling:smiling};
+}
+
+/* ---------- state ---------- */
+var S={data:null,beats:[],d:null,cursor:null,hover:null,geom:null};
+var $=function(id){return document.getElementById(id)};
+function beatKey(){return "screentest.beats."+(S.data.demo?"demo":S.data.title)}
+function saveBeats(){try{localStorage.setItem(beatKey(),JSON.stringify(S.beats))}catch(e){}}
+function loadBeats(){try{var r=localStorage.getItem(beatKey());if(r){var a=JSON.parse(r);if(Array.isArray(a))return a.filter(function(b){return b&&isFinite(b.t)&&TYPE_NAME[b.type]})}}catch(e){}return null}
+
+function setData(data){
+  S.data=data; LONG=data.duration>=3600*1.7;
+  S.beats=loadBeats()||data.beats||[];
+  S.beats.sort(function(a,b){return a.t-b.t});
+  S.cursor=null;S.hover=null;
+  $("showDemo").hidden=!!data.demo; $("resetBeats").hidden=!data.demo;
+  recompute();
+}
+function recompute(){ S.d=derive(S.data,S.beats); renderAll() }
+
+/* ---------- rendering ---------- */
+function renderAll(){renderHead();renderTimeline();renderLost();renderBeats();renderReadout();renderLegend()}
+
+function renderHead(){
+  var d=S.d,D=S.data;
+  $("title").textContent=D.title;
+  $("meta").innerHTML=d.N+" viewer"+(d.N===1?"":"s")+", "+Math.round(d.D/60)+" minutes"+
+    (D.demo?". <strong>This is simulated data</strong>, so you can see how a real screening reads. Load your own session files to replace it.":"");
+  var landed=d.beatRes.filter(function(b){return b.status==="landed"}).length,tot=d.beatRes.length,parts=[];
+  parts.push("People in the room were watching the screen <b>"+pct(d.avgAttn)+"</b> of the time.");
+  if(tot) parts.push("<b>"+landed+" of "+tot+"</b> tagged beats landed.");
+  if(d.walkouts.length) parts.push("<b>"+d.walkouts.length+" of "+d.N+"</b> walked out, the first at <b>"+tc(d.walkouts[0].t)+"</b>.");
+  else parts.push("Nobody walked out.");
+  if(d.lost.length){var w=d.lost[0];parts.push("The worst stretch runs <b>"+tc(w.start)+" to "+tc(w.end)+"</b>, where watching fell to <b>"+pct(w.attn)+"</b>.")}
+  else parts.push("No stretch fell far enough below the film's own average to flag.");
+  if(d.N<8) parts.push("With fewer than 8 viewers, treat every number here as a rough read.");
+  $("verdict").innerHTML=parts.join(" ");
+}
+
+function renderTimeline(){
+  var d=S.d,host=$("svgHost"),inner=$("tlInner");
+  var W=Math.max(780,$("tlScroll").clientWidth),G=112,PR=44,PW=W-G-PR,D=d.D;
+  inner.style.width=W+"px";
+  function x(t){return G+t/D*PW}
+  var Y={ruler:0,beats:30,attn:76,sync:184,react:268},H={attn:88,sync:64,react:60},total=340;
+  var o=[];
+  o.push('<svg width="'+W+'" height="'+total+'" viewBox="0 0 '+W+' '+total+'" role="img" aria-label="Attention, synchrony and reactions across the film">');
+  o.push('<defs><linearGradient id="half"><stop offset="50%" stop-color="var(--ink)"/><stop offset="50%" stop-color="var(--surface)"/></linearGradient></defs>');
+  // lost bands
+  d.lost.forEach(function(l){o.push('<rect class="lost-band" x="'+x(l.start).toFixed(1)+'" y="'+Y.beats+'" width="'+(x(l.end)-x(l.start)).toFixed(1)+'" height="'+(total-Y.beats)+'"/>')});
+  // ruler
+  var major=PW/(D/300)<46?600:300; if(D>4*3600)major=1800;
+  for(var t=0;t<=D;t+=60){
+    var mj=t%major===0,xx=x(t).toFixed(1);
+    o.push('<line class="grid-line" x1="'+xx+'" x2="'+xx+'" y1="'+(mj?14:19)+'" y2="24"/>');
+    if(mj){o.push('<text class="tick" x="'+xx+'" y="11" text-anchor="'+(t===0?"start":"middle")+'">'+tc(t)+'</text>');
+      o.push('<line class="grid-line" stroke-opacity=".55" x1="'+xx+'" x2="'+xx+'" y1="'+Y.beats+'" y2="'+total+'"/>')}
+  }
+  function label(y,a,b){o.push('<text class="lbl" x="12" y="'+(y+14)+'">'+a+'</text>'); if(b)o.push('<text class="sub" x="12" y="'+(y+29)+'">'+b+'</text>')}
+  function series(arr,y,h,max){
+    var segs=[],cur=[];
+    arr.forEach(function(v,i){ if(v===null){if(cur.length){segs.push(cur);cur=[]}return}
+      cur.push([x(Math.min(D,(i+.5)*BIN)),y+h-clamp(v/max,0,1)*h]) });
+    if(cur.length)segs.push(cur); return segs;
+  }
+  function draw(segs,y,h,areaCls,lineCls){
+    segs.forEach(function(sg){ if(sg.length<2)return;
+      var p=sg.map(function(q){return q[0].toFixed(1)+" "+q[1].toFixed(1)}).join("L");
+      o.push('<path class="'+areaCls+'" d="M'+sg[0][0].toFixed(1)+" "+(y+h)+"L"+p+"L"+sg[sg.length-1][0].toFixed(1)+" "+(y+h)+'Z"/>');
+      o.push('<path class="'+lineCls+'" d="M'+p+'"/>') });
+  }
+  // beats
+  label(Y.beats,"Beats","tagged moments");
+  o.push('<line class="grid-line" x1="'+G+'" x2="'+(W-PR)+'" y1="'+(Y.beats+36)+'" y2="'+(Y.beats+36)+'"/>');
+  d.beatRes.forEach(function(b,i){
+    var cx=x(b.t);
+    o.push('<line class="beat-stem" x1="'+cx.toFixed(1)+'" x2="'+cx.toFixed(1)+'" y1="'+(Y.beats+26)+'" y2="'+total+'"/>');
+    o.push('<g class="beat '+b.status+'" data-t="'+b.t+'"><title>'+esc(tc(b.t)+"  "+b.label+": "+(b.rate===null?"no one in the room":pct(b.rate)+" reacted, "+STATUS_NAME[b.status].toLowerCase()))+'</title><path d="'+shapePath(b.type,+cx.toFixed(1),Y.beats+16,7)+'"/></g>');
+  });
+  // attention
+  var srt=d.attnBin.filter(function(v){return v!==null}).sort(function(p,q){return p-q}),lo=srt.length?srt[Math.floor(srt.length*.03)]:0,floor=lo>.45?.4:0;
+  label(Y.attn,"Watching","avg "+pct(d.avgAttn)+" of the room");
+  o.push('<line class="grid-line" x1="'+G+'" x2="'+(W-PR)+'" y1="'+(Y.attn+H.attn)+'" y2="'+(Y.attn+H.attn)+'"/>');
+  o.push('<text class="tick" x="'+(W-PR+6)+'" y="'+(Y.attn+9)+'">100%</text><text class="tick" x="'+(W-PR+6)+'" y="'+(Y.attn+H.attn)+'">'+pct(floor)+'</text>');
+  draw(series(d.attnBin.map(function(v){return v===null?null:v-floor}),Y.attn,H.attn,1-floor),Y.attn,H.attn,"attn-area","attn-line");
+  var ya=(Y.attn+H.attn-(d.avgAttn-floor)/(1-floor)*H.attn).toFixed(1);
+  o.push('<line class="avg-line" x1="'+G+'" x2="'+(W-PR)+'" y1="'+ya+'" y2="'+ya+'"/>');
+  // sync
+  var smax=Math.max(.3,Math.max.apply(null,d.syncBin.map(function(v){return v||0})));
+  label(Y.sync,"In sync","reacting together");
+  o.push('<line class="grid-line" x1="'+G+'" x2="'+(W-PR)+'" y1="'+(Y.sync+H.sync)+'" y2="'+(Y.sync+H.sync)+'"/>');
+  draw(series(d.syncBin,Y.sync,H.sync,smax),Y.sync,H.sync,"sync-area","sync-line");
+  // reactions
+  label(Y.react,"Reactions","smiles and jolts");
+  o.push('<line class="grid-line" x1="'+G+'" x2="'+(W-PR)+'" y1="'+(Y.react+H.react)+'" y2="'+(Y.react+H.react)+'"/>');
+  var bw=Math.max(2.5,PW/d.nb-.4);
+  d.smileBin.forEach(function(v,i){ if(v<.04)return; var hh=v*H.react; o.push('<rect class="smile-bar" x="'+x(i*BIN).toFixed(1)+'" y="'+(Y.react+H.react-hh).toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+hh.toFixed(1)+'"/>') });
+  d.startleBin.forEach(function(v,i){ if(v<.25)return; var cx=x((i+.5)*BIN).toFixed(1),yy=(Y.react+H.react-v*H.react).toFixed(1);
+    o.push('<line class="startle" x1="'+cx+'" x2="'+cx+'" y1="'+(Y.react+H.react)+'" y2="'+yy+'"/><circle class="startle-dot" cx="'+cx+'" cy="'+yy+'" r="2.6"/>') });
+  o.push('</svg>');
+  host.innerHTML=o.join("");
+  S.geom={W:W,G:G,PW:PW,D:D};
+  renderGrid(); placeLines();
+}
+
+function cssVar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+function renderGrid(){
+  var g=S.geom,d=S.d,V=S.data.viewers,cv=$("grid");
+  var rowH=clamp(Math.floor(190/d.N),4,12),top=26,h=top+rowH*d.N+14,dpr=window.devicePixelRatio||1;
+  cv.width=Math.round(g.W*dpr);cv.height=Math.round(h*dpr);cv.style.width=g.W+"px";cv.style.height=h+"px";
+  var c=cv.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,g.W,h);
+  var ink=cssVar("--ink"),muted=cssVar("--muted"),attn=cssVar("--attn"),away=cssVar("--away"),rule=cssVar("--rule");
+  c.fillStyle=rule;c.fillRect(g.G,8,g.PW,1);
+  c.font='600 12.5px Archivo, "Helvetica Neue", Arial, sans-serif';c.fillStyle=ink;c.fillText("The room",12,top+10);
+  c.font='11.5px Archivo, "Helvetica Neue", Arial, sans-serif';c.fillStyle=muted;c.fillText("one row per viewer",12,top+25);
+  var cw=g.PW/d.nb;
+  for(var v=0;v<d.N;v++){var w=V[v],y=top+v*rowH;
+    for(var b=0;b<d.nb;b++){var t0=b*BIN,t1=Math.min(d.D,t0+BIN),f=0,a=0;
+      for(var t=t0;t<t1;t++){f+=w.face[t];a+=w.attention[t]}
+      if(t0>d.last[v])continue; var share=a/(t1-t0);
+      if(share>=.5){c.globalAlpha=.35+.65*share;c.fillStyle=attn}else{c.globalAlpha=1;c.fillStyle=away}
+      c.fillRect(g.G+b*cw,y,Math.max(1,cw+.3),rowH-1);
+    }}
+  c.globalAlpha=1;
+  cv.setAttribute("role","img");
+  cv.setAttribute("aria-label","Per-viewer attention. "+S.d.walkouts.length+" viewers stop appearing before the end.");
+}
+
+function placeLines(){
+  var g=S.geom; if(!g)return;
+  var cl=$("cursorLine"),hl=$("hoverLine");
+  if(S.cursor===null)cl.hidden=true; else{cl.hidden=false;cl.style.left=(g.G+S.cursor/g.D*g.PW)+"px"}
+  if(S.hover===null)hl.hidden=true; else{hl.hidden=false;hl.style.left=(g.G+S.hover/g.D*g.PW)+"px"}
+}
+
+function renderReadout(){
+  var d=S.d,t=S.hover!==null?S.hover:S.cursor,el=$("readout");
+  if(t===null){el.innerHTML='<span class="hint">Move across the timeline to read any moment. Click to set the playhead.</span>';return}
+  var b=clamp(Math.floor(t/BIN),0,d.nb-1),a=d.attnBin[b],s=d.syncBin[b],inRoom=d.roomBin[b];
+  var near=d.beatRes.filter(function(x){return Math.abs(x.t-t)<=BIN})[0];
+  el.innerHTML='<span class="t">'+tc(t)+'</span>'+
+    '<span>Watching <b>'+(a===null?"n/a":pct(a))+'</b></span>'+
+    '<span>In sync <b>'+(s===null?"n/a":s.toFixed(2))+'</b></span>'+
+    '<span>Smiling <b>'+pct(d.smileBin[b])+'</b></span>'+
+    '<span><b>'+inRoom+' of '+d.N+'</b> in the room</span>'+
+    (near?'<span>'+esc(near.label)+': <b>'+STATUS_NAME[near.status].toLowerCase()+'</b></span>':'');
+}
+
+function icon(type,status){
+  var fill=status==="landed"?"var(--ink)":status==="partial"?"url(#half)":"none";
+  return '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="'+fill+'" d="'+shapePath(type,8,8,6)+'"/></svg>';
+}
+function renderLegend(){
+  $("legend").innerHTML=
+    '<span class="k">'+icon("laugh","landed")+'Laugh</span><span class="k">'+icon("scare","landed")+'Scare</span><span class="k">'+icon("hold","landed")+'Hold</span>'+
+    '<span class="k">'+icon("laugh","landed")+'filled: landed</span><span class="k">'+icon("laugh","partial")+'half: partial</span><span class="k">'+icon("laugh","missed")+'empty: missed</span>'+
+    '<span class="k"><svg width="22" height="12" aria-hidden="true"><line x1="0" x2="22" y1="6" y2="6" stroke="var(--attn)" stroke-width="1" stroke-dasharray="4 4"/></svg>film average</span>'+
+    '<span class="k"><svg width="10" height="12" aria-hidden="true"><rect width="4" height="12" x="3" fill="var(--react)"/></svg>share smiling</span>'+
+    '<span class="k"><svg width="22" height="12" aria-hidden="true"><rect width="22" height="12" fill="var(--lost)"/></svg>lost stretch</span>'+
+    '<span class="k"><svg width="10" height="14" aria-hidden="true"><line x1="5" x2="5" y1="14" y2="4" stroke="var(--ink)" stroke-width="1.4"/><circle cx="5" cy="4" r="2.6" fill="var(--ink)"/></svg>jolt</span>';
+}
+
+function renderLost(){
+  var d=S.d,ul=$("lostList");
+  if(!d.lost.length){ul.innerHTML='<li class="empty">Nothing flagged. Watching never stayed more than 8 points under the film average for a full minute.</li>';return}
+  ul.innerHTML=d.lost.map(function(l){
+    var bits=["Watching fell to <b>"+pct(l.attn)+"</b> against a film average of "+pct(d.avgAttn)+", for "+Math.round((l.end-l.start)/60*10)/10+" minutes."];
+    if(l.walk) bits.push("<b>"+l.walk+"</b> walked out here.");
+    if(l.missed.length) bits.push("Missed: "+l.missed.map(function(m){return esc(m.label)}).join(", ")+".");
+    return '<li><button class="lost-item" data-t="'+l.start+'"><span class="range">'+tc(l.start)+" to "+tc(l.end)+'</span><span class="detail">'+bits.join(" ")+'</span></button></li>';
+  }).join("");
+}
+
+function renderBeats(){
+  var d=S.d,tb=$("beatTable");
+  if(!d.beatRes.length){tb.innerHTML='<tbody><tr><td class="empty" style="border-top:0">No beats tagged yet. Click the timeline where a laugh, scare or tense hold should happen, then add it below.</td></tr></tbody>';return}
+  tb.innerHTML='<thead><tr><th></th><th>At</th><th>Beat</th><th>Reacted</th><th>Result</th><th></th></tr></thead><tbody>'+
+    d.beatRes.map(function(b,i){
+      var r=b.rate===null?0:b.rate;
+      return '<tr><td>'+icon(b.type,b.status)+'</td><td class="tc"><button data-t="'+b.t+'" aria-label="Go to '+tc(b.t)+'">'+tc(b.t)+'</button></td>'+
+        '<td>'+esc(b.label)+' <span style="color:var(--muted)">('+TYPE_NAME[b.type].toLowerCase()+')</span></td>'+
+        '<td class="pct"><span class="bar"><i style="width:'+Math.round(r*100)+'%"></i></span>'+(b.rate===null?"n/a":b.hit+" of "+b.elig)+'</td>'+
+        '<td class="status">'+STATUS_NAME[b.status]+'</td>'+
+        '<td><button class="rm" data-rm="'+i+'" aria-label="Remove '+esc(b.label)+'">Remove</button></td></tr>';
+    }).join("")+'</tbody>';
+}
+
+/* ---------- interaction ---------- */
+function setCursor(t,scroll){
+  S.cursor=clamp(Math.round(t),0,S.d.D-1);S.hover=null;placeLines();renderReadout();
+  $("bTime").value=tc(S.cursor);
+  if(scroll){var g=S.geom,sc=$("tlScroll"),px=g.G+S.cursor/g.D*g.PW;
+    if(px<sc.scrollLeft+g.G||px>sc.scrollLeft+sc.clientWidth-20) sc.scrollLeft=px-sc.clientWidth/2;
+    sc.scrollIntoView({block:"nearest"})}
+}
+function timeAt(e){var g=S.geom,r=$("tlInner").getBoundingClientRect();return clamp((e.clientX-r.left-g.G)/g.PW*g.D,0,g.D-1)}
+$("tlInner").addEventListener("pointermove",function(e){ if(e.pointerType==="touch")return; S.hover=timeAt(e);placeLines();renderReadout() });
+$("tlInner").addEventListener("pointerleave",function(){S.hover=null;placeLines();renderReadout()});
+$("tlInner").addEventListener("click",function(e){
+  var bt=e.target.closest&&e.target.closest(".beat"); setCursor(bt?+bt.getAttribute("data-t"):timeAt(e),false) });
+$("tlScroll").addEventListener("keydown",function(e){
+  if(e.key!=="ArrowLeft"&&e.key!=="ArrowRight")return; e.preventDefault();
+  var step=(e.shiftKey?60:10)*(e.key==="ArrowLeft"?-1:1); setCursor((S.cursor===null?0:S.cursor)+step,true) });
+$("lostList").addEventListener("click",function(e){var b=e.target.closest("[data-t]"); if(b)setCursor(+b.getAttribute("data-t"),true)});
+$("beatTable").addEventListener("click",function(e){
+  var rm=e.target.closest("[data-rm]"),go=e.target.closest("[data-t]");
+  if(rm){S.beats.splice(+rm.getAttribute("data-rm"),1);saveBeats();recompute()}
+  else if(go)setCursor(+go.getAttribute("data-t"),true) });
+function addBeat(){
+  var t=parseTc($("bTime").value),err=$("bErr"),label=$("bLabel").value.trim();
+  if(t===null){err.textContent="Enter a timecode like 41:20.";$("bTime").focus();return}
+  if(t>=S.d.D){err.textContent="That is past the end of the film ("+tc(S.d.D)+").";$("bTime").focus();return}
+  err.textContent="";
+  S.beats.push({t:t,type:$("bType").value,label:label||TYPE_NAME[$("bType").value]+" at "+tc(t)});
+  S.beats.sort(function(a,b){return a.t-b.t}); saveBeats(); $("bLabel").value=""; recompute();
+}
+$("bAdd").addEventListener("click",addBeat);
+["bTime","bLabel"].forEach(function(id){$(id).addEventListener("keydown",function(e){if(e.key==="Enter")addBeat()})});
+$("resetBeats").addEventListener("click",function(){try{localStorage.removeItem(beatKey())}catch(e){} S.beats=DEMO.beats.map(function(b){return{t:b.t,type:b.type,label:b.label}});recompute()});
+$("showDemo").addEventListener("click",function(){showMsg("");setData(DEMO)});
+
+/* ---------- loading real sessions ---------- */
+function showMsg(s){var m=$("msg");m.textContent=s;m.hidden=!s}
+function toSession(obj,name){
+  var need=["face","attention","motion","smile"];
+  for(var i=0;i<need.length;i++) if(!Array.isArray(obj[need[i]])) throw new Error(name+': missing the "'+need[i]+'" array.');
+  var dt=+obj.dt>0?+obj.dt:1,n=Math.min(obj.face.length,obj.attention.length,obj.motion.length,obj.smile.length),D=Math.floor(n*dt);
+  if(D<60) throw new Error(name+": under a minute of data, which is too short to read.");
+  function rs(a,T){var out=new T(D);for(var t=0;t<D;t++){var v=+a[Math.min(n-1,Math.floor(t/dt))];out[t]=isFinite(v)?v:0}return out}
+  return{id:String(obj.viewer_id||name.replace(/\.json$/i,"")),film:obj.film,D:D,face:rs(obj.face,Uint8Array),attention:rs(obj.attention,Uint8Array),motion:rs(obj.motion,Float32Array),smile:rs(obj.smile,Float32Array)};
+}
+$("files").addEventListener("change",function(e){
+  var files=[].slice.call(e.target.files||[]); if(!files.length)return;
+  Promise.all(files.map(function(f){return f.text().then(function(txt){return{name:f.name,txt:txt}})})).then(function(list){
+    var sessions=[],errors=[],beats=null,title=null;
+    list.forEach(function(it){
+      try{var obj=JSON.parse(it.txt);
+        if(Array.isArray(obj.viewers)){ if(obj.film&&obj.film.title)title=obj.film.title; if(Array.isArray(obj.beats))beats=obj.beats;
+          obj.viewers.forEach(function(v,i){sessions.push(toSession(v,it.name+" viewer "+(i+1)))}) }
+        else sessions.push(toSession(obj,it.name));
+      }catch(err){errors.push(err instanceof SyntaxError?it.name+": not valid JSON.":err.message)}
+    });
+    if(!sessions.length){showMsg("Nothing loaded.\n"+errors.join("\n")+"\nEach file needs viewer_id, dt, face, attention, motion and smile. Open the format notes at the bottom of the page for an example.");return}
+    var D=Math.max.apply(null,sessions.map(function(s){return s.D}));
+    sessions.forEach(function(s){ if(s.D<D){["face","attention","motion","smile"].forEach(function(k){var a=new s[k].constructor(D);a.set(s[k]);s[k]=a})} });
+    title=title||sessions[0].film||"Untitled screening";
+    showMsg(errors.length?"Loaded "+sessions.length+" viewer"+(sessions.length===1?"":"s")+". Skipped:\n"+errors.join("\n"):"");
+    setData({title:String(title),duration:D,viewers:sessions,demo:false,
+      beats:(beats||[]).filter(function(b){return b&&isFinite(b.t)&&TYPE_NAME[b.type]}).map(function(b){return{t:+b.t,type:b.type,label:String(b.label||TYPE_NAME[b.type])}})});
+  });
+  e.target.value="";
+});
+
+/* ---------- boot ---------- */
+var DEMO=buildDemo();
+setData(DEMO);
+var rt;window.addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(function(){renderTimeline()},120)});
+if(window.matchMedia){var mq=window.matchMedia("(prefers-color-scheme: dark)");(mq.addEventListener?mq.addEventListener.bind(mq,"change"):mq.addListener.bind(mq))(function(){renderGrid()})}
+new MutationObserver(function(){renderGrid()}).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){renderGrid()});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1B1420">
+<title>Screentest: be the test audience</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1B1420; --card:#251B2C; --card2:#2F2338; --ink:#F7EEDD; --muted:#B5A6B8;
+  --pop:#FF7A45; --pop-ink:#1B1420; --lav:#C9B8FF; --ok:#8BE39B; --warn:#FFC857; --line:rgba(247,238,221,.12);
+  box-sizing:border-box;
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:17px; line-height:1.45; -webkit-font-smoothing:antialiased;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+button{font:inherit; color:inherit; cursor:pointer}
+input{font:inherit; color:inherit}
+:focus-visible{outline:3px solid var(--lav); outline-offset:3px}
+[hidden]{display:none!important}
+
+.screen{min-height:100dvh; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:28px 20px 40px; text-align:center}
+.inner{width:100%; max-width:440px; margin:0 auto}
+
+h1{font-size:clamp(40px,11vw,60px); line-height:.98; font-weight:800; letter-spacing:-.03em; margin:0 0 18px; font-variation-settings:"opsz" 96}
+h2{font-size:clamp(30px,8vw,40px); line-height:1.02; font-weight:800; letter-spacing:-.025em; margin:0 0 14px}
+p{margin:0 0 14px; color:var(--muted); font-size:17px}
+p.lead{color:var(--ink); font-size:19px}
+.hl{color:var(--pop)}
+
+.btn{
+  display:block; width:100%; padding:18px 22px; border:0; border-radius:999px;
+  background:var(--pop); color:var(--pop-ink); font-weight:800; font-size:19px; letter-spacing:-.01em;
+  transition:transform .12s ease, filter .12s ease;
+}
+.btn:hover{filter:brightness(1.06)} .btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.45; cursor:not-allowed; transform:none; filter:none}
+.btn.ghost{background:transparent; color:var(--ink); border:2px solid var(--line); font-weight:600}
+.btn.ghost:hover{border-color:var(--muted); filter:none}
+.btn.lav{background:var(--lav); color:var(--pop-ink)}
+.stack{display:grid; gap:12px; margin-top:26px}
+.tiny{font-size:14px; color:var(--muted); margin-top:16px}
+.tiny a, .tiny button.link{color:var(--lav); background:none; border:0; padding:0; text-decoration:underline; text-underline-offset:3px; font-size:inherit}
+
+/* hero blob */
+.orb{
+  width:150px; height:150px; margin:0 auto 26px; border-radius:46% 54% 55% 45% / 52% 40% 60% 48%;
+  background:radial-gradient(circle at 35% 30%, #FFB48F, var(--pop) 45%, #B23E7B 100%);
+  box-shadow:0 30px 70px -20px rgba(255,122,69,.55); animation:blob 7s ease-in-out infinite;
+}
+@keyframes blob{0%,100%{border-radius:46% 54% 55% 45% / 52% 40% 60% 48%} 50%{border-radius:56% 44% 42% 58% / 44% 58% 42% 56%; transform:rotate(6deg)}}
+@media (prefers-reduced-motion: reduce){.orb,.dot{animation:none!important}}
+
+details.what{margin-top:22px; text-align:left; background:var(--card); border-radius:18px; padding:4px 18px}
+details.what summary{cursor:pointer; padding:12px 0; font-weight:600; list-style:none; display:flex; justify-content:space-between; align-items:center}
+details.what summary::after{content:"+"; font-size:22px; color:var(--lav)} details.what[open] summary::after{content:"–"}
+details.what ul{margin:0 0 14px; padding-left:20px; color:var(--muted); font-size:15.5px}
+details.what li{margin-bottom:6px}
+
+/* camera check */
+.cam{
+  position:relative; width:min(78vw,300px); aspect-ratio:3/4; margin:0 auto 18px; border-radius:28px; overflow:hidden;
+  background:var(--card2); border:3px solid var(--line); transition:border-color .3s;
+}
+.cam.ok{border-color:var(--ok)} .cam.bad{border-color:var(--warn)}
+.cam video{width:100%; height:100%; object-fit:cover; transform:scaleX(-1); display:block}
+.chip{
+  display:inline-flex; align-items:center; gap:8px; padding:9px 16px; border-radius:999px; font-weight:700; font-size:15px;
+  background:var(--card2); color:var(--muted); margin-bottom:18px;
+}
+.chip .dot{width:10px; height:10px; border-radius:50%; background:var(--muted)}
+.chip.ok{color:var(--ok)} .chip.ok .dot{background:var(--ok); animation:pulse 1.6s infinite}
+.chip.bad{color:var(--warn)} .chip.bad .dot{background:var(--warn)}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.5}}
+.field{text-align:left; margin-top:6px}
+.field label{display:block; font-size:14px; color:var(--muted); margin-bottom:6px}
+.field input{
+  width:100%; padding:15px 18px; border-radius:16px; border:2px solid var(--line); background:var(--card); font-size:18px; font-weight:600;
+}
+.field input:focus{border-color:var(--lav); outline:none}
+
+/* recording */
+.rec{background:#000; color:#6E6472}
+.rec h2{color:#8E8393; font-size:22px; font-weight:600; letter-spacing:0}
+.rec .time{font-size:clamp(56px,16vw,88px); font-weight:800; letter-spacing:-.04em; color:#3A323F; line-height:1; margin:10px 0 24px; font-variant-numeric:tabular-nums}
+.rec .dot{display:inline-block; width:10px; height:10px; border-radius:50%; background:#B23E4B; animation:pulse 2s infinite; margin-right:8px; vertical-align:middle}
+.rec .btn.ghost{border-color:#2A2430; color:#8E8393}
+.rec .btn.ghost:hover{border-color:#5A4F60}
+.rec p{color:#4E4553; font-size:15px}
+.rec .face-warn{color:var(--warn); font-weight:600; min-height:1.4em}
+
+.hold{position:relative; overflow:hidden}
+.hold i{position:absolute; inset:0; width:0; background:rgba(255,122,69,.25); transition:width .1s linear}
+.hold span{position:relative}
+
+/* recap */
+.card{
+  background:linear-gradient(160deg,#3A2647,#251B2C 60%); border-radius:30px; padding:28px 24px; text-align:left;
+  border:1px solid var(--line); position:relative; overflow:hidden;
+}
+.card::before{content:""; position:absolute; right:-70px; top:-70px; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle, rgba(255,122,69,.55), transparent 70%)}
+.card .eyebrow{font-size:14px; color:var(--lav); font-weight:600; margin-bottom:6px}
+.card .big{font-size:clamp(64px,20vw,96px); font-weight:800; letter-spacing:-.05em; line-height:.95; color:var(--ink)}
+.card .big small{font-size:.4em; letter-spacing:-.02em; color:var(--pop); margin-left:4px}
+.card .sub{color:var(--muted); font-size:16px; margin:6px 0 22px}
+.stats{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.stat{background:rgba(0,0,0,.25); border-radius:18px; padding:14px 14px 12px}
+.stat b{display:block; font-size:28px; font-weight:800; letter-spacing:-.03em; line-height:1.05}
+.stat span{font-size:13.5px; color:var(--muted)}
+.card .foot{margin-top:18px; font-size:13px; color:var(--muted); display:flex; justify-content:space-between}
+.card .foot b{color:var(--ink); font-weight:700}
+
+.sent{color:var(--ok); font-weight:700}
+.err{background:#3A1F2C; color:#FFB3B3; border-radius:16px; padding:14px 16px; text-align:left; font-size:15px; margin-top:16px}
+</style>
+</head>
+<body>
+
+<!-- 1. welcome -->
+<section class="screen" id="s-welcome">
+  <div class="inner">
+    <div class="orb" aria-hidden="true"></div>
+    <h1>you're the<br>test audience.</h1>
+    <p class="lead">Watch <span class="hl" id="filmName">the film</span> like you normally would. Your camera notices when you're locked in and when you drift.</p>
+    <p>No video is saved. Ever. Just numbers, and only on your device until you choose to send them.</p>
+    <div class="stack">
+      <button class="btn" id="go">let's go</button>
+    </div>
+    <details class="what">
+      <summary>ok but what actually gets tracked</summary>
+      <ul>
+        <li>whether you're looking at the screen or your phone</li>
+        <li>when you smile, jump, or go totally still</li>
+        <li>if you get up and leave</li>
+        <li>nothing else. no faces, no photos, no audio.</li>
+      </ul>
+    </details>
+    <p class="tiny">Works best on a laptop or a phone propped up facing you, in a room that isn't pitch black.</p>
+  </div>
+</section>
+
+<!-- 2. camera check -->
+<section class="screen" id="s-camera" hidden>
+  <div class="inner">
+    <h2>say hi to<br>your camera</h2>
+    <p>Just checking we can see you. This preview isn't recorded.</p>
+    <div class="cam" id="cam"><video id="video" playsinline muted autoplay></video></div>
+    <div class="chip" id="chip"><span class="dot"></span><span id="chipText">starting camera…</span></div>
+    <div class="field">
+      <label for="nick">what should we call you? (nickname is fine)</label>
+      <input id="nick" maxlength="24" autocomplete="off" placeholder="e.g. nate, seat 4, mystery viewer">
+    </div>
+    <div class="stack">
+      <button class="btn" id="toReady" disabled>looks good</button>
+    </div>
+    <div class="err" id="camErr" hidden></div>
+    <p class="tiny" id="mockNote" hidden>Demo mode: no camera, made-up reactions.</p>
+  </div>
+</section>
+
+<!-- 3. ready -->
+<section class="screen" id="s-ready" hidden>
+  <div class="inner">
+    <h2>hit this the second<br>the film starts</h2>
+    <p>Timing matters, so we can line your reactions up with the exact moment on screen. Then put this tab down and forget about it.</p>
+    <p class="tiny" style="margin-top:0">Keep this tab open and your screen awake. Don't cover the camera.</p>
+    <div class="stack">
+      <button class="btn" id="start">▶&nbsp; film's starting</button>
+      <button class="btn ghost" id="backCam">back to camera check</button>
+    </div>
+  </div>
+</section>
+
+<!-- 4. recording -->
+<section class="screen rec" id="s-rec" hidden>
+  <div class="inner">
+    <h2><span class="dot" aria-hidden="true"></span>recording reactions</h2>
+    <div class="time" id="clock">0:00</div>
+    <p>go watch the film. we've got this.</p>
+    <p class="face-warn" id="faceWarn"></p>
+    <div class="stack">
+      <button class="btn ghost hold" id="stop"><i></i><span>hold to finish (film's over)</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- 5. recap -->
+<section class="screen" id="s-done" hidden>
+  <div class="inner">
+    <h2>that's a wrap 🎬</h2>
+    <p>Here's how you watched. Send it to whoever's running the screening and you're done.</p>
+    <div class="card" id="card">
+      <div class="eyebrow" id="cardWho">your screening recap</div>
+      <div class="big"><span id="pctWatch">0</span><small>%</small></div>
+      <div class="sub">of the film with your eyes on the screen</div>
+      <div class="stats">
+        <div class="stat"><b id="stSmiles">0</b><span>smiles caught</span></div>
+        <div class="stat"><b id="stJolts">0</b><span>times you jumped</span></div>
+        <div class="stat"><b id="stAway">0</b><span>phone checks / look-aways</span></div>
+        <div class="stat"><b id="stStill">0</b><span>longest locked-in stretch</span></div>
+      </div>
+      <div class="foot"><span id="cardFilm"></span><span>biggest smile at <b id="stPeak">–</b></span></div>
+    </div>
+    <div class="stack">
+      <button class="btn" id="send" hidden>send to the host</button>
+      <button class="btn lav" id="download">download my file</button>
+      <button class="btn ghost" id="again">start over</button>
+    </div>
+    <p class="tiny" id="sentNote"></p>
+    <p class="tiny">The file is a small .json of per-second numbers. The host drops it into their Screentest dashboard.</p>
+  </div>
+</section>
+
+<script type="module">
+const $ = id => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+const FILM = params.get("film") || "the film";
+const UPLOAD = params.get("upload");            // optional: POST endpoint for the host
+const MOCK = params.get("demo") === "1";
+$("filmName").textContent = FILM;
+
+const screens = ["s-welcome","s-camera","s-ready","s-rec","s-done"];
+function show(id){ screens.forEach(s => $(s).hidden = s !== id); window.scrollTo(0,0); }
+
+/* ---------- face model ---------- */
+const MP_VER = "0.10.21";
+const MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
+let landmarker = null, stream = null;
+const video = $("video");
+
+async function loadModel(){
+  if (MOCK) return;
+  const { FaceLandmarker, FilesetResolver } = await import(`https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MP_VER}/vision_bundle.mjs`);
+  const files = await FilesetResolver.forVisionTasks(`https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${MP_VER}/wasm`);
+  landmarker = await FaceLandmarker.createFromOptions(files, {
+    baseOptions: { modelAssetPath: MODEL, delegate: "GPU" },
+    runningMode: "VIDEO", numFaces: 1,
+    outputFaceBlendshapes: true, outputFacialTransformationMatrixes: true
+  });
+}
+async function openCamera(){
+  if (MOCK) return;
+  stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 15 } }, audio: false });
+  video.srcObject = stream; await video.play();
+}
+function headAngles(m){          // 4x4 column-major from MediaPipe
+  const r = (row,col) => m.data[col*4+row];
+  const yaw = Math.atan2(-r(2,0), Math.hypot(r(0,0), r(1,0))) * 180/Math.PI;
+  const pitch = Math.atan2(r(2,1), r(2,2)) * 180/Math.PI;
+  return [yaw, pitch];
+}
+let mockT = 0;
+function readFrame(nowMs){
+  if (MOCK){                     // made-up viewer for testing the flow
+    mockT += 1/12; const t = mockT;
+    const away = Math.sin(t/9) > .85;
+    return { found: t % 200 < 190, yaw: away ? 40 : Math.sin(t/3)*4, pitch: Math.sin(t/5)*3, down: away ? .8 : .1,
+      smile: (t % 47 < 3) ? .8 : .05, blink: Math.random() < .03, nose: [ .5 + Math.sin(t)*.003 + ((t % 83 < .4) ? .08 : 0), .5 ], width: .25 };
+  }
+  if (!landmarker || video.readyState < 2) return null;
+  const res = landmarker.detectForVideo(video, nowMs);
+  if (!res.faceLandmarks?.length) return { found:false };
+  const lm = res.faceLandmarks[0];
+  const bs = {}; for (const c of res.faceBlendshapes[0].categories) bs[c.categoryName] = c.score;
+  const [yaw, pitch] = headAngles(res.facialTransformationMatrixes[0]);
+  return {
+    found: true, yaw, pitch,
+    down: (bs.eyeLookDownLeft + bs.eyeLookDownRight)/2,
+    smile: (bs.mouthSmileLeft + bs.mouthSmileRight)/2,
+    blink: (bs.eyeBlinkLeft + bs.eyeBlinkRight)/2 > .5,
+    nose: [lm[1].x, lm[1].y],
+    width: Math.hypot(lm[234].x - lm[454].x, lm[234].y - lm[454].y) || 1e-6
+  };
+}
+
+/* ---------- camera check ---------- */
+let checkTimer = null, ready = false;
+$("go").onclick = async () => {
+  show("s-camera"); $("mockNote").hidden = !MOCK;
+  setChip("bad","starting camera…");
+  try {
+    await Promise.all([openCamera(), loadModel()]);
+  } catch (e) {
+    const denied = /NotAllowed|Permission/i.test(String(e));
+    $("camErr").hidden = false;
+    $("camErr").textContent = denied
+      ? "Camera's blocked. Tap the camera icon in your address bar (or Settings → Site permissions) and allow it, then reload."
+      : "Couldn't start the camera or load the face model. Check you're online and no other app is using the camera, then reload.";
+    setChip("bad","camera unavailable"); return;
+  }
+  let seen = 0;
+  checkTimer = setInterval(() => {
+    const f = readFrame(performance.now());
+    if (f?.found){ seen++; setChip("ok","we see you ✓"); $("cam").className = "cam ok"; }
+    else { seen = 0; setChip("bad","move into frame, add some light"); $("cam").className = "cam bad"; }
+    ready = seen >= 3; $("toReady").disabled = !ready;
+  }, 400);
+};
+function setChip(state, text){ $("chip").className = "chip " + state; $("chipText").textContent = text; }
+$("toReady").onclick = () => { clearInterval(checkTimer); show("s-ready"); };
+$("backCam").onclick = () => $("go").onclick();
+
+/* ---------- recording ---------- */
+let buckets, t0, rafId, prevNose = null, prevBlink = false, wake = null, lostSince = null;
+function bucket(sec){
+  return buckets[sec] ||= { frames:0, found:0, yaw:[], pitch:[], down:[], smile:0, motion:0, blinks:0 };
+}
+$("start").onclick = async () => {
+  buckets = {}; t0 = performance.now(); prevNose = null; lostSince = null;
+  show("s-rec");
+  try { wake = await navigator.wakeLock?.request("screen"); } catch {}
+  document.addEventListener("visibilitychange", async () => { if (document.visibilityState === "visible" && !wake) { try { wake = await navigator.wakeLock?.request("screen"); } catch {} } });
+  let last = 0;
+  const loop = (now) => {
+    rafId = requestAnimationFrame(loop);
+    if (now - last < 80) return;          // ~12 fps is plenty and saves battery
+    last = now;
+    const el = (now - t0)/1000, sec = Math.floor(el);
+    const b = bucket(sec); b.frames++;
+    const f = readFrame(now);
+    if (f?.found){
+      b.found++; b.yaw.push(f.yaw); b.pitch.push(f.pitch); b.down.push(f.down);
+      b.smile = Math.max(b.smile, f.smile);
+      if (f.blink && !prevBlink) b.blinks++; prevBlink = f.blink;
+      if (prevNose) b.motion += Math.hypot(f.nose[0]-prevNose[0], f.nose[1]-prevNose[1]) / f.width;
+      prevNose = f.nose; lostSince = null; $("faceWarn").textContent = "";
+    } else {
+      prevNose = null; lostSince ??= el;
+      if (el - lostSince > 20) $("faceWarn").textContent = "can't see you right now. still recording.";
+    }
+    if (sec % 1 === 0) $("clock").textContent = fmt(sec);
+  };
+  rafId = requestAnimationFrame(loop);
+};
+function fmt(s){ const m = Math.floor(s/60), ss = s%60; return `${m}:${String(ss).padStart(2,"0")}`; }
+
+// hold-to-finish so a stray tap doesn't end the session
+const stopBtn = $("stop"); let holdStart = null, holdRaf;
+function holdTick(){ const p = Math.min(1, (performance.now()-holdStart)/1200); stopBtn.querySelector("i").style.width = (p*100)+"%"; if (p >= 1) finish(); else holdRaf = requestAnimationFrame(holdTick); }
+function holdBegin(e){ e.preventDefault(); holdStart = performance.now(); holdTick(); }
+function holdEnd(){ cancelAnimationFrame(holdRaf); holdStart = null; stopBtn.querySelector("i").style.width = "0"; }
+stopBtn.addEventListener("pointerdown", holdBegin); stopBtn.addEventListener("pointerup", holdEnd); stopBtn.addEventListener("pointerleave", holdEnd); stopBtn.addEventListener("pointercancel", holdEnd);
+stopBtn.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && !holdStart) holdBegin(e); });
+stopBtn.addEventListener("keyup", holdEnd);
+
+/* ---------- summarise ---------- */
+let session = null;
+const median = a => { const s = [...a].sort((x,y)=>x-y); return s.length ? s[s.length>>1] : 0; };
+const mean = a => a.reduce((x,y)=>x+y,0)/(a.length||1);
+function summarise(){
+  const n = Math.max(...Object.keys(buckets).map(Number)) + 1;
+  const face = Array(n).fill(0), attention = Array(n).fill(0), motion = Array(n).fill(0), smile = Array(n).fill(0), blink = Array(n).fill(0);
+  const yaw = [], pitch = [], down = [], raw = [];
+  for (let s=0; s<n; s++){
+    const b = buckets[s]; if (!b || !b.frames || b.found < b.frames*.5) { yaw.push(null); pitch.push(null); down.push(null); raw.push(0); continue; }
+    face[s] = 1; yaw.push(mean(b.yaw)); pitch.push(mean(b.pitch)); down.push(mean(b.down));
+    motion[s] = +b.motion.toFixed(4); raw[s] = b.smile; blink[s] = b.blinks;
+  }
+  const seen = []; for (let s=0; s<n; s++) if (face[s]) seen.push(s);
+  if (seen.length){
+    // this viewer's usual head position = looking at the screen, so camera placement doesn't matter
+    const y0 = median(seen.map(s=>yaw[s])), p0 = median(seen.map(s=>pitch[s])), d0 = median(seen.map(s=>down[s]));
+    for (const s of seen) attention[s] = (Math.abs(yaw[s]-y0) < 25 && Math.abs(pitch[s]-p0) < 20 && (down[s]-d0) < .35) ? 1 : 0;
+    const sorted = seen.map(s=>raw[s]).sort((a,b)=>a-b), rest = sorted[Math.floor(sorted.length*.2)] || 0;
+    for (const s of seen) smile[s] = +Math.min(1, Math.max(0, (raw[s]-rest)/Math.max(1e-6, 1-rest))).toFixed(3);
+  }
+  return { viewer_id: ($("nick").value.trim() || "viewer"), film: FILM, dt: 1, recorded_at: new Date().toISOString(), face, attention, motion, smile, blink };
+}
+function finish(){
+  holdEnd(); cancelAnimationFrame(rafId);
+  try { wake?.release(); } catch {}
+  stream?.getTracks().forEach(t => t.stop()); video.srcObject = null;
+  if (!buckets || Object.keys(buckets).length < 30){ alert("That was under 30 seconds, so there's nothing useful to save. Start over when the film's actually rolling."); show("s-ready"); return; }
+  session = summarise(); renderRecap(session); show("s-done");
+}
+function renderRecap(s){
+  const n = s.face.length, seen = s.face.reduce((a,b)=>a+b,0), watch = s.attention.reduce((a,b)=>a+b,0);
+  $("pctWatch").textContent = seen ? Math.round(100*watch/seen) : 0;
+  // smiles: separate events above .5
+  let smiles = 0, inSmile = false, peak = -1, peakV = 0;
+  s.smile.forEach((v,i) => { if (v > .5 && !inSmile) smiles++; inSmile = v > .5; if (v > peakV){ peakV = v; peak = i; } });
+  const m = s.motion.filter((v,i)=>s.face[i]), mu = mean(m), sd = Math.sqrt(mean(m.map(v=>(v-mu)**2))) || 1;
+  let jolts = 0, inJ = false; s.motion.forEach((v,i) => { const j = s.face[i] && v > mu + 3*sd; if (j && !inJ) jolts++; inJ = j; });
+  let away = 0, inAway = false, run = 0, best = 0;
+  for (let i=0;i<n;i++){ const off = s.face[i] && !s.attention[i]; if (off && !inAway) away++; inAway = off; run = s.attention[i] ? run+1 : 0; best = Math.max(best, run); }
+  $("stSmiles").textContent = smiles; $("stJolts").textContent = jolts; $("stAway").textContent = away;
+  $("stStill").textContent = best >= 60 ? Math.round(best/60) + " min" : best + " s";
+  $("stPeak").textContent = peakV > .3 ? fmt(peak) : "–";
+  $("cardWho").textContent = (s.viewer_id === "viewer" ? "your" : s.viewer_id + "'s") + " screening recap";
+  $("cardFilm").textContent = s.film + " · " + fmt(n);
+  $("send").hidden = !UPLOAD;
+}
+
+/* ---------- deliver ---------- */
+const safe = s => s.replace(/[^A-Za-z0-9._-]+/g,"_").replace(/^_+|_+$/g,"");
+$("download").onclick = () => {
+  const blob = new Blob([JSON.stringify(session)], { type: "application/json" });
+  const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: `${safe(session.film)}__${safe(session.viewer_id)}.json` });
+  document.body.appendChild(a); a.click(); a.remove();
+  $("sentNote").textContent = "Saved to your downloads. Text or AirDrop it to the host.";
+};
+$("send").onclick = async () => {
+  $("send").disabled = true; $("send").textContent = "sending…";
+  try {
+    const r = await fetch(UPLOAD, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(session) });
+    if (!r.ok) throw new Error(r.status);
+    $("send").textContent = "sent ✓"; $("sentNote").innerHTML = '<span class="sent">The host has your file.</span> You can close this tab.';
+  } catch {
+    $("send").disabled = false; $("send").textContent = "send to the host";
+    $("sentNote").textContent = "Sending didn't work. Download the file instead and send it over directly.";
+  }
+};
+$("again").onclick = () => location.reload();
+</script>
+</body>
+</html>
